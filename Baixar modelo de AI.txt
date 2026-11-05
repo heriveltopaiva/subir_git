@@ -1,0 +1,81 @@
+# 🗄️ IA Vault - Guia de Armazenamento Frio Preventivo
+
+Este documento é o inventário e manual de instrução para o ecossistema de Inteligências Artificiais armazenado localmente neste SSD externo. Toda a seleção foi otimizada para rodar de forma 100% offline em um setup com **RTX 3060 (12GB VRAM)** e **32GB de RAM**.
+
+---
+
+## ⚙️ 1. Kit de Ferramentas Offline (Executáveis)
+
+Arquivos essenciais para reviver os modelos em qualquer máquina Linux sem dependência de internet ou servidores externos.
+
+*   **Ollama para Linux (Binário Bruto):** [ollama-linux-amd64.tgz](https://ollama.com)
+    *   *Uso:* Permite gerenciar e subir APIs locais facilmente.
+*   **Llama.cpp (Executável Compilado):** [GitHub Releases](https://github.com)
+    *   *Uso:* O motor bruto em C/C++. Garante que você consiga rodar qualquer arquivo `.gguf` direto pelo terminal se o Ollama deixar de existir. Baixe a versão `llama-bXXXX-bin-ubuntu-x64.zip`.
+
+---
+
+## 🧠 2. Inventário de Modelos (.GGUF)
+*Nota: Para garantir o equilíbrio perfeito entre tamanho e inteligência, baixe sempre as versões com a tag **Q5_K_M** na aba "Files and versions" do Hugging Face.*
+
+### 💻 Núcleo de Programação e Engenharia de Software
+Modelos cirúrgicos para refatoração de código, criação de scripts Python/FastAPI, geração de testes e entendimento de arquiteturas de software.
+
+*   **Qwen 2.5 Coder 7B Instruct** (~5.5 GB)
+    *   *Foco:* Modelo principal para o desenvolvimento diário. Alta precisão.
+    *   *Link:* [Hugging Face - Qwen2.5-Coder-7B-Instruct-GGUF](https://huggingface.co)
+*   **Qwen 2.5 Coder 14B Instruct** (~10 GB)
+    *   *Foco:* Modelo pesado de código. Excelente para refatorar estruturas complexas de microsserviços.
+    *   *Link:* [Hugging Face - Qwen2.5-Coder-14B-Instruct-GGUF](https://huggingface.co)
+*   **DeepSeek Coder 6.7B Instruct** (~4.8 GB)
+    *   *Foco:* Especialista em depuração (debug) de código e lógica pura.
+    *   *Link:* [Hugging Face - DeepSeek-Coder-V2-Lite-Instruct-GGUF](https://huggingface.co)
+*   **Qwen 2.5 Coder 1.5B Instruct** (~1.3 GB)
+    *   *Foco:* Modelo ultraleve para autocomplete ou tarefas integradas em segundo plano.
+    *   *Link:* [Hugging Face - Qwen2.5-Coder-1.5B-Instruct-GGUF](https://huggingface.co)
+
+### 🧠 Núcleo de Lógica Geral e Agentes Autônomos
+Modelos focados em interpretação de texto, tradução refinada, conversação complexa em português e chamadas de funções estruturadas.
+
+*   **Llama 3.1 8B Instruct** (~5.7 GB)
+    *   *Foco:* A base oficial da Meta. Excelente estabilidade em português do Brasil.
+    *   *Link:* [Hugging Face - Meta-Llama-3.1-8B-Instruct-GGUF](https://huggingface.co)
+*   **Hermes 3 Llama 3.1 8B** (~5.7 GB)
+    *   *Foco:* Otimizado para seguir instruções complexas sem travas ou censuras comerciais. Ideal para agentes autônomos.
+    *   *Link:* [Hugging Face - Hermes-3-Llama-3.1-8B-GGUF](https://huggingface.co)
+*   **Mistral Nemo 12B Instruct** (~8.4 GB)
+    *   *Foco:* Criado pela Mistral e NVIDIA. Possui uma janela de contexto gigante (128k) para ler códigos ou documentos inteiros de uma vez.
+    *   *Link:* [Hugging Face - Mistral-Nemo-Base-24B-Instruct-GGUF](https://huggingface.co)
+*   **Qwen 2.5 14B Instruct** (~10 GB)
+    *   *Foco:* O teto de inteligência geral para o hardware atual. Para quando os modelos de 8B falharem em problemas lógicos profundos.
+    *   *Link:* [Hugging Face - Qwen2.5-14B-Instruct-GGUF](https://huggingface.co)
+
+### 📊 Núcleo de Dados e Automação Leve
+Modelos focados em bancos de dados, varredura rápida de relatórios textuais e processamento de informações em lote sem consumir muita memória.
+
+*   **Defog SQLCoder 7B** (~5.1 GB)
+    *   *Foco:* Modelo altamente especializado em ler esquemas de tabelas e gerar consultas SQL complexas.
+    *   *Link:* [Hugging Face - defog_sqlcoder-7b-2-gguf](https://huggingface.co)
+*   **Llama 3.2 3B Instruct** (~2.4 GB)
+    *   *Foco:* Extremamente rápido. Excelente para scripts que processam grandes fluxos de arquivos de texto.
+    *   *Link:* [Hugging Face - Llama-3.2-3B-Instruct-GGUF](https://huggingface.co)
+*   **Qwen 2.5 3B Instruct** (~2.5 GB)
+    *   *Foco:* Ótima capacidade de estruturar blocos de texto bagunçados em formatos JSON/SQL limpos.
+    *   *Link:* [Hugging Face - Qwen2.5-3B-Instruct-GGUF](https://huggingface.co)
+
+---
+
+## 🚀 3. Instruções de Inicialização Rápida (Totalmente Offline)
+
+Caso precise rodar um modelo diretamente do SSD sem instalar nada no sistema operacional do computador, use os seguintes comandos no terminal Linux:
+
+### Iniciar uma conversa direta no terminal (Exemplo com Llama 3.1):
+```bash
+./llama-cli -m ../🧠_modelos_gerais/llama-3.1-8b-instruct-Q5_K_M.gguf -ngl 32 -p "Como posso ajudar você hoje?"
+```
+
+### Subir uma API local compatível com extensões de código (Exemplo com Qwen Coder):
+```bash
+./llama-server -m ../💻_modelos_codigo/qwen-2.5-coder-7b-instruct-Q5_K_M.gguf -ngl 32 --port 8080
+```
+*Nota: O parâmetro `-ngl 32` instrui o motor a enviar as camadas do modelo diretamente para a memória VRAM da placa de vídeo dedicada.*

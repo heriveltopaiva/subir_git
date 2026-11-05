@@ -1,0 +1,89 @@
+=====================================================================
+      ROADMAP DE ENGENHARIA: SISTEMA DE CRM COM INTELIGÊNCIA ARTIFICIAL
+=====================================================================
+
+---
+📌 MARCO 1: A ARQUITETURA DE CAPTURA (Foco Inicial)
+---
+O OBJETIVO: 
+Fazer a IA extrair dados de uma conversa informal (chat de WhatsApp, 
+transcrição de reunião ou e-mail) e transformar em um JSON 
+perfeitamente estruturado para o seu banco de dados.
+
+O QUE ESTUDAR NA PRÁTICA:
+- Function Calling e Structured Outputs.
+- Validação de tipos de dados com Pydantic em Python.
+
+PROMPT PARA O CLAUDE (Copie e cole no chat):
+"Claude, preciso desenhar o primeiro módulo do meu CRM. O objetivo é 
+receber um texto bruto de uma conversa de vendas e extrair: Nome do 
+Cliente, Empresa, Dor Principal, Valor Estimado do Contrato e Próximo 
+Passo. Como eu utilizo Structured Outputs (ou Pydantic com a API da 
+OpenAI/Anthropic) para garantir que a IA me devolva sempre o formato 
+correto sem quebrar meu código Python? Explique-me o conceito e me 
+guie na criação do esquema."
+
+---
+📌 MARCO 2: A MEMÓRIA E CONTEXTO DO CLIENTE (RAG de Vendas)
+---
+O OBJETIVO:
+Permitir que o usuário ou o sistema pergunte ao CRM: "O que conversamos 
+com o cliente X no mês passado?" e a IA busque o histórico exato.
+
+O QUE ESTUDAR NA PRÁTICA:
+- Bancos de dados vetoriais locais (ex: ChromaDB ou FAISS).
+- Estratégias de chunking de texto e gerenciamento de metadados.
+
+PROMPT PARA O CLAUDE (Copie e cole no chat):
+"Minha IA já extrai os dados estruturados do Marco 1, mas agora preciso 
+criar o histórico de interações do cliente. Pensando em Ciência de 
+Dados e NLP, como estruturar um banco vetorial local (como ChromaDB) 
+para salvar as notas de cada reunião e fazer buscas semânticas eficientes? 
+Qual a melhor estratégia para agrupar e filtrar as mensagens pertencentes 
+a um mesmo cliente?"
+
+---
+📌 MARCO 3: AUTOMAÇÃO AGÊNTICA (Tool Calling)
+---
+O OBJETIVO:
+Após analisar a conversa, o agente do CRM deve identificar a ação futura 
+(ex: "Enviar proposta na quarta-feira") e disparar um gatilho de forma 
+autônoma para criar um card ou tarefa no sistema.
+
+O QUE ESTUDAR NA PRÁTICA:
+- Agents, Tool Calling avançado.
+- Orquestração com frameworks agênticos (LangGraph ou CrewAI).
+
+PROMPT PARA O CLAUDE (Copie e cole no chat):
+"Quero que meu agente tome ações. Se ele identificar que o próximo passo 
+é agendar um retorno, ele deve chamar uma função Python que simule uma 
+inserção em uma API de calendário ou banco de dados. Como eu crio o 
+conceito de 'Tools' (ferramentas) para a LLM decidir quando e como usar 
+essa função de forma totalmente autônoma?"
+
+---
+📌 MARCO 4: AVALIAÇÃO E GUARDRAILS (A sua especialidade)
+---
+O OBJETIVO:
+Garantir que o agente de CRM nunca invente dados que não estavam no 
+texto original (alucinação) ou registre valores financeiros errados.
+
+O QUE ESTUDAR NA PRÁTICA:
+- Frameworks de avaliação de LLMs (Ragas, TruLens).
+- Prompt Engineering avançado (Few-Shot e Chain-of-Thought).
+
+PROMPT PARA O CLAUDE (Copie e cole no chat):
+"Como especialista em Ciência de Dados, quero criar um script de teste 
+(utilizando a abordagem LLM-as-a-Judge) para validar o meu extrator de 
+dados do Marco 1. Como configuro um modelo menor (ou prompts específicos) 
+para auditar se o meu CRM está inventando dados ou deixando passar 
+informações comerciais cruciais?"
+
+=====================================================================
+DIRETRIZES DE FLUXO NO LINUX/VS CODE:
+1. Comece estritamente pelo Marco 1. Não misture os problemas.
+2. Escreva você mesmo a estrutura e o código Python que o Claude sugerir.
+3. Se estourar erros de biblioteca ou ambiente local, jogue o log bruto 
+   no ChatGPT para depuração rápida enquanto mantém o Claude focado 
+   na arquitetura lógica do sistema.
+=====================================================================

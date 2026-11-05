@@ -1,0 +1,39 @@
+=====================================================================
+ROTEIRO DE ESTUDOS: ENGENHARIA DE AGENTES E SISTEMAS DE IA (LLM-OPS)
+=====================================================================
+
+1. ORQUESTRAÇÃO E FLUXOS AGÊNTICOS (O "Cérebro" do Agente)
+   - LangChain & LangGraph: Esqueça fluxos lineares. Estude como 
+     criar grafos onde o agente decide se precisa voltar um passo.
+   - CrewAI: Essencial para o seu CRM. Como fazer um "Agente de 
+     Vendas" conversar com um "Agente de Pesquisa de Cliente".
+   - State Management: Como manter o contexto de uma mentoria longa 
+     sem estourar o limite de tokens.
+
+2. RAG AVANÇADO (A "Memória" do Agente de Estudos)
+   - Chunking Strategies: Não é só quebrar texto. Estude Semantic 
+     Chunking para seu agente de estudos entender o contexto real.
+   - Vetores e Bancos de Dados: Como você já usa Linux e VS Code, 
+     aprofunde em ChromaDB ou Pinecone integrado ao seu workflow.
+   - Re-ranking: Como filtrar o que é realmente importante antes 
+     de enviar para a LLM (economiza grana e aumenta precisão).
+
+3. TOOL CALLING E ACTIONS (O "Braço" do Agente)
+   - Function Calling: Como fazer seu agente escrever sozinho no 
+     Google Sheets (seu CRM) ou criar tarefas no calendário.
+   - MCP (Model Context Protocol): O novo padrão da Anthropic para 
+     conectar IAs a dados locais (seus arquivos do Obsidian, por ex).
+
+4. AVALIAÇÃO E MONITORAMENTO (A parte "Ciência de Dados")
+   - LLM-as-a-Judge: Usar um modelo forte (GPT-4o) para avaliar se 
+     o seu agente de mentoria está sendo coerente.
+   - LangSmith: Monitorar onde o agente "se perde" no raciocínio.
+   - Prompt Engineering Avançado: Chain-of-Thought (CoT) e 
+     Few-shot prompting para reduzir alucinações no CRM.
+
+5. INFRAESTRUTURA E DEPLOY (Colocando em Produção)
+   - Local LLMs (Ollama): Rodar modelos menores localmente no seu 
+     Linux para tarefas simples de processamento de texto.
+   - APIs de Streaming: Para que seu agente de mentoria responda 
+     em tempo real, sem "congelar" a tela.
+=====================================================================

@@ -1,0 +1,91 @@
+===============================================================================
+                       HSP SITE INSPECTOR - ARQUITETURA
+===============================================================================
+Objetivo Principal: Inspecionar portais de veículos e classificados de forma 
+                    automatizada (engenharia reversa), mapeando dados visuais 
+                    e lógicos para consolidar e gerar uma tabela estruturada 
+                    de estoque (ID, Preço, Geolocalização, Título, etc.).
+
+Ambiente Híbrido:   [MAESTRO PYTHON] + [ESPECIALISTA NODE.JS (AST)]
+Conectividade:      Servidor MCP (Model Context Protocol) integrado para IAs
+===============================================================================
+
+1. ESTRUTURA DE DIRETÓRIOS CONCEITUAL
+-------------------------------------------------------------------------------
+hsp-site-inspector/
+├── server.py                 # Servidor FastMCP (Interface de Entrada p/ IA)
+├── analisador_ast.js         # Script Node.js p/ quebra sintática de JavaScript
+└── modules/
+    ├── __init__.py
+    ├── 01_coletor.py         # Orquestração HTTP / Playwright Headless
+    ├── 02_analisador_html.py # Parsing Semântico (BeautifulSoup4)
+    ├── 03_detector_tech.py   # Análise de assinaturas e meta-dados globais
+    ├── 04_analisador_js.py   # Interface c/ o subprocesso Node.js (AST)
+    ├── 05_detector_api.py    # Interceptação de tráfego de rede (XHR/Fetch)
+    ├── 06_detector_pagin.py  # Análise lógica de paginação, offsets e limits
+    ├── 07_detector_ads.py    # Filtros de scripts de terceiros / Trackers
+    ├── 08_detector_campos.py # Mapeamento estrutural de Forms e inputs
+    ├── 09_analisador_pag.py  # Consolidação de URLs individuais
+    ├── 10_mapeador_meta.py   # Extração de dados de SEO e redes sociais
+    ├── 11_unificador.py      # Core de Fusão de Modelos Contextuais (Mundos 1+2)
+    └── 12_validador.py       # Engine de validação de geração e normalização
+
+
+2. DETALHAMENTO DE COMPONENTES E MATRIZ TÉCNICA
+-------------------------------------------------------------------------------
+[FRENTE 1: CAPTURA E PROCESSO SEMÂNTICO (PYTHON - MAESTRO)]
+* Módulo 01 (Coletor): Inicia instância assíncrona com Playwright, burla detecção
+  básica de robôs e faz a triagem inicial: salva o HTML e baixa os scripts (.js).
+* Módulo 02 & 08 (HTML e Campos): BeautifulSoup4 processa a árvore de tags. Se o 
+  site renderizar os cards nativamente, o Módulo 08 define um seletor dinâmico 
+  (ex: ".vehicle-card") e extrai os blocos repetitivos que darão origem às linhas.
+* Módulo 05 & 06 (APIs e Paginação): Escuta em background eventos de rede de rede.
+  Se encontrar payloads do tipo JSON que retornem listas numéricas com marcas e 
+  preços, o Módulo 06 captura a lógica de controle (`&offset=20`, `&page=2`) para 
+  mapear o ciclo de requisições sem depender do clique no botão físico do HTML.
+
+[FRENTE 2: PROCESSO SINTÁTICO DE BAIXO NÍVEL (NODE.JS)]
+* Módulo 04 (Analisador JS): Aciona o `analisador_ast.js` via Pipe/Subprocess.
+  O interpretador quebra os arquivos .js do site usando o Parser Acorn / Babel,
+  gerando um objeto AST (Abstract Syntax Tree). 
+* Extração Oculta: Varre as declarações de escopo e variáveis globais procurando 
+  configurações de mapas (ex: coordenadas geográficas que alimentam pinos de 
+  latitude/longitude que não aparecem na interface textual para o usuário).
+
+
+3. O FLUXO DE FUSÃO DO MÓDULO 11 (O UNIFICADOR)
+-------------------------------------------------------------------------------
+O Unificador atua sobre os dados estruturados de ambas as frentes para compor 
+um Grafo de Relacionamentos antes do consumo da Inteligência Artificial.
+
+   [Módulo 02 - HTML] ───► Localiza ID visual do botão: `#btn-ver-preco`
+                                     │
+                                     ▼
+                        [Módulo 11 - O UNIFICADOR] 
+                  Mapeia a relação de evento (onClick)
+                                     ▲
+                                     │
+   [Módulo 04 - AST]  ───► Mapeia função anônima que calcula o preço final
+   [Módulo 05 - Rede] ───► Mapeia endpoint da requisição: `/api/v1/vehicles`
+
+
+4. NORMALIZAÇÃO PARA A TABELA FINAL DE ESTOQUE
+-------------------------------------------------------------------------------
+Antes do envio para exportação, os dados passam pela camada de tratamento:
+* Normalização de Preço: Converte "R$ 45.900,00" -> Inteiro/Float estruturado 
+  junto da ISO da moeda (ex: `45900.00 | BRL`).
+* Georreferenciamento: Associa os dados extraídos da AST (Latitude/Longitude) 
+  ao endereço textual correspondente localizado no HTML pelo BeautifulSoup.
+* Output: O dicionário final gerado é um JSON padronizado com o Schema idêntico 
+  ao de tabelas relacionais de estoque (vehicle_id, title, coordinates, price).
+
+
+5. CONSUMO VIA MODEL CONTEXT PROTOCOL (MCP)
+-------------------------------------------------------------------------------
+O arquivo de entrada `server.py` expõe a ferramenta `inspecionar_site(url: str)`
+para o ecossistema MCP. 
+* Comportamento: O Cliente MCP (Cursor ou Claude Desktop) aciona a ferramenta. 
+  A arquitetura executa silenciosamente o fluxo unificado e devolve apenas o 
+  Grafo Consolidado em formato texto. A IA recebe as regras de negócio mastigadas, 
+  permitindo ao Módulo 12 criar ou preencher tabelas de estoque sem margem de erro.
+===============================================================================

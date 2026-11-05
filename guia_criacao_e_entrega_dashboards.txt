@@ -1,0 +1,64 @@
+GUIA DE MERCADO: CRIAÇÃO E ENTREGA DE DASHBOARDS CORPORATIVOS
+
+===============================================================================
+PARTE 1: COMO É FEITO O PROCESSO NO MERCADO
+===============================================================================
+A criação de dashboards combina estratégia de negócios, análise de dados e design visual seguindo 5 etapas estruturadas:
+
+1. Alinhamento e Levantamento de Requisitos:
+   - Definição de KPIs (indicadores-chave como faturamento, churn, conversão).
+   - Entendimento do público-alvo (diretores focam no macro, analistas no detalhe).
+   - Mapeamento das fontes de dados (bancos de dados, planilhas, CRMs, ERPs).
+
+2. Engenharia e Preparação de Dados (ETL):
+   - Extração, limpeza e cruzamento de tabelas.
+   - Modelagem de dados (ex: Star Schema) para garantir rapidez nas consultas.
+
+3. Design de Interface e Wireframing (UX/UI):
+   - Criação de esboços/wireframes no Figma ou papel.
+   - Storytelling: organização lógica dos gráficos (leitura de cima para baixo, esquerda para a direita).
+   - Identidade visual limpa e profissional.
+
+4. Desenvolvimento na Ferramenta de BI:
+   - Criação de métricas com linguagens de fórmulas (ex: DAX no Power BI).
+   - Escolha dos melhores visuais para cada tipo de dado.
+
+5. Publicação, Governança e Manutenção:
+   - Distribuição em ambiente nuvem seguro.
+   - Configuração de atualizações automáticas e segurança a nível de linha (RLS).
+
+Principais Ferramentas: Microsoft Power BI, Tableau, Looker Studio e linguagens de programação (Python/R com Streamlit/Dash).
+
+
+===============================================================================
+PARTE 2: COMO ENTREGAR E APRESENTAR O DASHBOARD PARA A EMPRESA
+===============================================================================
+Existem três modelos principais de entrega, dependendo do orçamento e da maturidade técnica do cliente:
+
+OPÇÃO 1: Usando o próprio ambiente em nuvem da ferramenta (O mais comum)
+- Como funciona: O painel é publicado na nuvem oficial da ferramenta (ex: Power BI Service). O acesso é compartilhado diretamente com o e-mail corporativo dos usuários.
+- Vantagens: Entrega rápida, segura e sem necessidade de programar sistemas.
+- Custos: Geralmente exige licenças pagas por usuário (ex: licença Pro do Power BI).
+
+OPÇÃO 2: Sistema Separado / Portal Próprio (Embedded Analytics)
+- Como funciona: Cria-se um site ou aplicativo do zero (usando React, Python, etc.) com login próprio. O dashboard é embutido (injeta-se o código) de forma invisível via API dentro desse portal.
+- Vantagens: Marca 100% personalizada e economia de licenças individuais se houver centenas ou milhares de usuários acessando.
+- Desvantagens: Exige conhecimento em desenvolvimento web e maior custo inicial de infraestrutura.
+
+OPÇÃO 3: Integrado no Sistema Atual da Empresa (Intranet/ERP/CRM)
+- Como funciona: A ferramenta de BI gera um código de incorporação (iframe ou API) e a equipe de TI da própria empresa insere o painel em uma nova aba do sistema que eles já utilizam no dia a dia.
+- Vantagens: O usuário não precisa abrir ferramentas externas; o relatório fica centralizado onde eles já trabalham.
+- Desvantagens: Depende totalmente da cooperação e disponibilidade do setor de TI do cliente.
+
+
+===============================================================================
+ROTEIRO DE ABORDAGEM COM O CLIENTE
+===============================================================================
+Na fase de diagnóstico, faça duas perguntas essenciais:
+1. "Quantas pessoas vão precisar acessar esse relatório no dia a dia?"
+2. "Vocês já utilizam alguma ferramenta de BI ou têm um sistema interno centralizado?"
+
+Direcionamento da Proposta:
+- Pequenas e Médias Empresas (Até 15 usuários): Recomende a OPÇÃO 1 (Nuvem oficial). Menor tempo de desenvolvimento e custo-benefício ideal.
+- Empresas com volume massivo de acessos (ou revenda de acessos): Recomende a OPÇÃO 2 (Portal Próprio) para evitar custos excessivos de licenças individuais.
+- Empresas com TI bem estruturada: Ofereça a OPÇÃO 3 (Integração no sistema deles) para centralizar a operação.

@@ -1,0 +1,73 @@
+---
+name: design-grafico
+description: Cria e revisa peças gráficas digitais e impressas, como cards, anúncios, banners e materiais de comunicação visual. Use quando a tarefa exigir composição visual estática, organização de informação ou preparação de arquivos gráficos.
+---
+
+# Habilidade: Design Gráfico
+
+## Objetivo
+Criar peças gráficas claras, funcionais e visualmente consistentes, alinhadas ao briefing e ao objetivo de comunicação.
+
+## Escopo
+- Cards, anúncios, banners e peças para redes sociais.
+- Composição de textos, imagens, formas e elementos gráficos.
+- Adaptação de peças para diferentes formatos.
+- Revisão visual e preparação de arquivos para exportação.
+
+Não assumir que a habilidade pode operar diretamente um software ou gerar um arquivo final. Se a ferramenta necessária não estiver disponível, entregar uma especificação visual clara ou instruções de execução.
+
+## Entradas
+Usar, quando disponíveis:
+- Objetivo da peça e mensagem principal.
+- Público e canal de publicação.
+- Texto obrigatório, imagens e identidade visual.
+- Dimensões, formato e prazo.
+- Referências e restrições.
+
+Se faltar informação essencial, fazer perguntas objetivas. Não inventar marca, logotipo, paleta ou dados.
+
+## Fundamentos visuais
+1. **Hierarquia:** destacar o elemento mais importante por escala, contraste e posicionamento.
+2. **Espaço negativo:** evitar excesso de elementos e preservar áreas de respiro.
+3. **Alinhamento:** organizar elementos com uma grade consistente.
+4. **Tipografia:** usar no máximo duas famílias tipográficas por projeto; priorizar títulos expressivos e textos de apoio legíveis.
+5. **Contraste:** garantir leitura entre texto e fundo.
+6. **Consistência:** manter cores, tipografia e estilo coerentes em séries de peças.
+
+## Fluxo de trabalho
+1. Interpretar o briefing antes de profissionalizar a composição.
+2. Definir mensagem principal, hierarquia e formato.
+3. Planejar a composição e a distribuição dos elementos.
+4. Organizar camadas e grupos com nomes claros.
+5. Preferir edição não destrutiva: máscaras, objetos inteligentes e camadas de ajuste; evitar apagar pixels permanentemente ou rasterizar vetores sem necessidade.
+6. Conferir margens seguras e legibilidade no tamanho de uso.
+7. Preparar a exportação conforme o destino.
+
+## Preparação técnica
+- Para telas, trabalhar em RGB.
+- Para impressão, trabalhar em CMYK e preparar resolução adequada ao processo; como referência geral, 300 DPI.
+- PNG: transparência ou gráficos que exijam bordas nítidas.
+- JPEG otimizado: fotografias e imagens de grande dimensão.
+- Confirmar dimensões, perfil de cor, resolution e peso antes de exportar.
+
+## Saída esperada
+Entregar a peça, quando houver ferramenta compatível, ou uma especificação contendo:
+- formato e dimensões;
+- hierarquia e composição;
+- textos e elementos necessários;
+- orientação de cores e tipografia;
+- formato de exportação.
+
+## Verificação
+Antes de concluir, confirmar:
+- A mensagem principal é identificada rapidamente?
+- A leitura está clara e o contraste é suficiente?
+- Há espaço negativo e alinhamento consistente?
+- Os elementos importantes estão dentro das margens seguras?
+- A peça respeita o briefing e o formato de destino?
+- O arquivo está organizado e preparado para exportação?
+
+## Restrições
+- Não inventar informações, preços, marcas ou alegações.
+- Não aplicar identidade visual personalizada sem dados fornecidos.
+- Não declarar que um arquivo foi criado ou exportado se isso não ocorreu.

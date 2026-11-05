@@ -1,0 +1,683 @@
+================================================================================
+🎓 UNIVERSIDADE DE ENGENHARIA DE IA APLICADA
+Currículo Completo — 4 Semestres / 2 Anos / ~480h
+================================================================================
+
+--------------------------------------------------------------------------------
+📋 VISÃO GERAL DO CURSO
+--------------------------------------------------------------------------------
+Título:            Engenheiro de IA Aplicada
+Duração:           4 semestres (24 meses)
+Carga horária:     ~480 horas (teoria + prática + projetos)
+Metodologia:       Socrática, baseada em projetos reais
+Stack principal:   Python (FastAPI, SQLAlchemy), TypeScript (Angular)
+Infra local:       Linux + RTX 3060 + Ollama
+Projeto final:     Micro-SaaS AutoInsight (CRM para revenda de veículos)
+Pré-requisitos:    Lógica de programação, Python intermediário, APIs REST, SQL básico
+
+--------------------------------------------------------------------------------
+🗺️ MAPA MACRO DOS 4 SEMESTRES
+--------------------------------------------------------------------------------
+
+┌─────────────────────────────────────────────────────────────────────┐
+│  1º SEMESTRE — FUNDAMENTOS E ORQUESTRAÇÃO DE LLMs                  │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐    │
+│  │ 1.1 Fund. IA │ │ 1.2 Prompt   │ │ 1.3 APIs de IA Generativa│    │
+│  │   e LLMs     │ │  Engineering │ │   e Provedores           │    │
+│  └──────────────┘ └──────────────┘ └──────────────────────────┘    │
+├─────────────────────────────────────────────────────────────────────┤
+│  2º SEMESTRE — RAG, BANCOS VETORIAIS E MCP                         │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐    │
+│  │ 2.1 RAG e    │ │ 2.2 Model    │ │ 2.3 Arquitetura de       │    │
+│  │ Busca Semânt.│ │ Context Prot.│ │   Sistemas AI-First      │    │
+│  └──────────────┘ └──────────────┘ └──────────────────────────┘    │
+├─────────────────────────────────────────────────────────────────────┤
+│  3º SEMESTRE — AGENTES AUTÔNOMOS E ORQUESTRAÇÃO                    │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐    │
+│  │ 3.1 Agentes  │ │ 3.2 LangGraph│ │ 3.3 Sistemas Multiagente │    │
+│  │ Autônomos    │ │ e Workflows  │ │                          │    │
+│  └──────────────┘ └──────────────┘ └──────────────────────────┘    │
+├─────────────────────────────────────────────────────────────────────┤
+│  4º SEMESTRE — PRODUÇÃO, GOVERNANÇA E CAPSTONE                     │
+│  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐    │
+│  │ 4.1 AI-Driven│ │ 4.2 Segurança│ │ 4.3 Fine-Tuning e        │    │
+│  │ DevOps/FinOps│ │ e Governança │ │   Process. de Dados      │    │
+│  └──────────────┘ └──────────────┘ └──────────────────────────┘    │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │         🎯 CAPSTONE PROJECT — Micro-SaaS AutoInsight         │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+📘 1º SEMESTRE — FUNDAMENTOS E ORQUESTRAÇÃO DE LLMs
+Carga horária: 120h | Duração: 6 meses
+================================================================================
+
+--------------------------------------------------------------------------------
+Disciplina 1.1 — Fundamentos de IA, ML e LLMs
+Carga: 40h | Pré-requisito: Nenhum
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- História da IA: da "máquina inteligente" aos LLMs
+- Linha do tempo: ML → DL → LLMs → Ferramentas atuais
+- Arquitetura Transformer: embeddings, atenção, camadas
+- Diferença entre ML, DL, IA e LLMs
+- Tensores, redes neurais e como aprendem
+- Ciclo completo: dados → treino → validação → inferência
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+Ao final, o aluno será capaz de:
+1. Explicar a evolução histórica da IA até os LLMs
+2. Descrever o funcionamento interno de um Transformer
+3. Diferenciar ML, DL e IA com exemplos práticos
+4. Operar múltiplos modelos locais via Ollama
+5. Comparar respostas de diferentes modelos
+
+🧪 PRÁTICA ADAPTADA
+- Orquestração de modelos locais com Ollama (RTX 3060)
+- Comparação: Llama 3, Mistral, Qwen, Phi
+- Benchmark de latência, qualidade e uso de VRAM
+- Entrega: CLI Python que consulta múltiplos modelos e compara respostas
+
+❓ PERGUNTAS SOCRÁTICAS
+- "Por que a atenção é mais eficiente que RNNs para sequências longas?"
+- "O que muda no tensor quando passamos de 7B para 70B parâmetros?"
+- "Como você mediria a 'qualidade' de uma resposta sem um humano?"
+
+📖 BIBLIOGRAFIA
+- Vaswani et al. (2017) — Attention Is All You Need
+- Jay Alammar — The Illustrated Transformer
+- Documentação Ollama + Hugging Face
+
+--------------------------------------------------------------------------------
+Disciplina 1.2 — Engenharia de Prompts Avançada
+Carga: 40h | Pré-requisito: 1.1
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- Prompt chaining (encadear prompts para tarefas complexas)
+- Prompt templates para padronizar fluxos
+- Few-shot, Zero-shot, Chain-of-Thought (CoT)
+- Estratégias para reduzir alucinações
+- Padrões de prompt para: codar, debugar, documentar, aprender
+- Otimização de tokens e custo-eficiência
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Escrever prompts que geram respostas consistentes
+2. Aplicar chaining em tarefas multi-etapas
+3. Criar biblioteca de templates reutilizáveis
+4. Medir e reduzir alucinações
+5. Otimizar consumo de tokens
+
+🧪 PRÁTICA
+- Construir Prompt Library em Python (versionada)
+- Testes A/B entre variantes de prompt
+- Entrega: Sistema de templates com versionamento e testes automatizados
+
+❓ PERGUNTAS SOCRÁTICAS
+- "Como você estruturaria um prompt para que o modelo 'pense em voz alta'?"
+- "Qual o trade-off entre few-shot e fine-tuning?"
+- "Como detectar que uma resposta é alucinação?"
+
+--------------------------------------------------------------------------------
+Disciplina 1.3 — APIs de IA Generativa e Provedores
+Carga: 40h | Pré-requisito: 1.2
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- Panorama do mercado de IA como serviço
+- OpenAI, Anthropic, Google Gemini, Hugging Face, OpenRouter
+- Diferenças de APIs, modelos e cenários de uso
+- Custos, latência, limites e fallback entre provedores
+- Modelos multimodais (texto, imagem, áudio, vídeo)
+- OpenAI Vision, Whisper, Gemini Multimodal
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Integrar LLMs da OpenAI a um backend existente
+2. Escolher o provedor certo por cenário
+3. Implementar fallback entre provedores
+4. Usar modelos multimodais em aplicações práticas
+5. Construir um OCR inteligente
+
+🧪 PRÁTICA
+- Integrar LLM da OpenAI a um backend FastAPI
+- Fluxo: requisições, autenticação, versionamento, testes
+- Entrega: API REST com autenticação, versionamento e testes
+
+📖 BIBLIOGRAFIA
+- Documentação OpenAI API, Anthropic, Gemini
+- OpenRouter Docs
+
+================================================================================
+📗 2º SEMESTRE — RAG, BANCOS VETORIAIS E MCP
+Carga horária: 120h | Duração: 6 meses
+================================================================================
+
+--------------------------------------------------------------------------------
+Disciplina 2.1 — RAG e Busca Semântica
+Carga: 40h | Pré-requisito: 1.3
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- O que é RAG (Retrieval-Augmented Generation)
+- Embeddings e Vector Databases
+- Similarity search (busca por "significado")
+- Estratégias de chunking
+- RAG avançado: hybrid search, multi-index, agentic RAG
+- LangChain e Pipes para orquestração
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Explicar por que RAG é crucial para LLMs
+2. Implementar busca semântica com pgvector
+3. Escolher estratégia de chunking por tipo de documento
+4. Construir pipeline de indexação e consulta
+5. Avaliar qualidade de recuperação
+
+🧪 PRÁTICA ADAPTADA
+- pgvector + SQLAlchemy + FastAPI (em vez de Postgres com JS)
+- Pipeline robusto de indexação e consulta
+- Documentos do mercado automotivo
+- Entrega: RAG funcional para documentos automotivos
+
+❓ PERGUNTAS SOCRÁTICAS
+- "Como você decidiria o tamanho ideal de chunk?"
+- "Por que similaridade de cosseno funciona melhor que distância euclidiana?"
+- "Quando RAG falha e fine-tuning é necessário?"
+
+--------------------------------------------------------------------------------
+Disciplina 2.2 — Model Context Protocol (MCP)
+Carga: 40h | Pré-requisito: 2.1
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- O que é MCP e por que está ganhando tração
+- Como resolve o caos de integrações customizadas
+- Integração padronizada LLM ↔ APIs, bancos, serviços
+- MCPs vs Tools tradicionais
+- MCP em Python: criar e consumir
+- Segurança: autenticação, Service Tokens, rate limiting, WAF
+- Casos de uso reais em empresas
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Explicar o problema que MCP resolve
+2. Criar servidor MCP nativo em Python
+3. Conectar MCP ao VS Code (Continue)
+4. Implementar segurança em MCPs
+5. Transformar serviços internos em MCPs
+
+🧪 PRÁTICA
+- Servidor MCP nativo em Python expondo banco relacional
+- Integração com VS Code (Continue)
+- Entrega: MCP integrado ao VS Code consultando contexto do projeto
+
+📖 BIBLIOGRAFIA
+- Anthropic — Model Context Protocol Spec
+- Documentação Continue (VS Code)
+
+--------------------------------------------------------------------------------
+Disciplina 2.3 — Arquitetura de Sistemas AI-First
+Carga: 40h | Pré-requisito: 2.2
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- Arquiteturas tradicionais vs AI-driven
+- Padrões: Prompting, Responsible AI, UX, AI-Ops, Optimization
+- Decision framework: IA vs regras determinísticas
+- Trade-offs: latência, precisão, custo, performance
+- Single-agent vs multi-agent
+- Design patterns: RAG, Model Router, Intent-Based Routing, Semantic Cache, HITL
+- Arquitetura Enterprise: API Gateway → K8s → Serviços → Observabilidade
+- Modelos de implantação: Kubernetes, Serverless, Edge
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Projetar arquiteturas AI-first em produção
+2. Aplicar decision framework para IA vs regras
+3. Implementar roteamento inteligente de modelos
+4. Simular controle de custos (Model Tiering)
+5. Mapear stack completo de IA enterprise
+
+🧪 PRÁTICA
+- Simulação de roteamento de modelos e controle de custos
+- Entrega: Diagrama de arquitetura + protótipo de roteador
+
+================================================================================
+📙 3º SEMESTRE — AGENTES AUTÔNOMOS E ORQUESTRAÇÃO
+Carga horária: 120h | Duração: 6 meses
+================================================================================
+
+--------------------------------------------------------------------------------
+Disciplina 3.1 — Agentes Autônomos: Fundamentos
+Carga: 40h | Pré-requisito: 2.3
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- Agent loop: percepção → raciocínio → ação → feedback
+- Estrutura interna: planner, executor, memory store, toolbox
+- Tipos: task-based, interactive, goal-oriented, autonomous
+- Padrões de raciocínio: ReAct, Plan-and-Execute, Reflection
+- Function calling e tool use
+- Design de schemas JSON para funções executáveis
+- Conexão com APIs REST, bancos, automações, MCPs
+- Memória: curta, longa, episódica, contextual
+- Reflection loops e autoavaliação
+- Guardrails e human-in-the-loop
+- Prevenção de runaway loops e abusos de API
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Implementar agent loop completo
+2. Aplicar ReAct e Plan-and-Execute
+3. Criar schemas JSON para tools
+4. Implementar sistemas de memória
+5. Adicionar guardrails e HITL
+
+🧪 PRÁTICA
+- Agente que cria, executa e ajusta tarefas com ferramentas externas
+- Entrega: Agente ReAct funcional com logs e feedback loops
+
+❓ PERGUNTAS SOCRÁTICAS
+- "Como você evita que um agente entre em loop infinito?"
+- "Quando usar ReAct vs Plan-and-Execute?"
+- "Como estruturar memória de longo prazo sem estourar contexto?"
+
+--------------------------------------------------------------------------------
+Disciplina 3.2 — LangGraph e Workflows Complexos
+Carga: 40h | Pré-requisito: 3.1
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- Introdução ao LangGraph como orquestrador multiagente
+- Criação de grafos de execução e controle de dependências
+- Roteamento de tarefas, fallback handlers, retry logic
+- Monitoramento e depuração de agentes em grafos
+- Migração de scripts lineares para grafos
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Modelar workflows como grafos LangGraph
+2. Implementar fallback e retry
+3. Monitorar execução em grafos
+4. Migrar código linear para grafos
+
+🧪 PRÁTICA
+- Migrar scripts lineares para LangGraph
+- Entrega: Workflow multi-etapas com fallback e retry
+
+📖 BIBLIOGRAFIA
+- Documentação LangGraph (LangChain)
+
+--------------------------------------------------------------------------------
+Disciplina 3.3 — Sistemas Multiagente
+Carga: 40h | Pré-requisito: 3.2
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- Conceitos de colaboração: orquestração, coordenação, negociação
+- Padrões: Supervisor, Hierarchical, Group Chat, Delegation, Consensus
+- Comunicação assíncrona e troca de mensagens
+- Desafios distribuídos: falhas de nó, coordenação, estado, sincronização
+- Casos reais: Claude Team, AutoGPTs, CrewAI, Agentarium
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Implementar padrões multiagente
+2. Gerenciar comunicação assíncrona
+3. Lidar com falhas distribuídas
+4. Aplicar multiagentes em cenários corporativos
+
+🧪 PRÁTICA
+- Mini sistema multiagente (analista → planejador → executor)
+- Entrega: Sistema cooperativo com métricas de eficácia
+
+================================================================================
+📕 4º SEMESTRE — PRODUÇÃO, GOVERNANÇA E CAPSTONE
+Carga horária: 120h | Duração: 6 meses
+================================================================================
+
+--------------------------------------------------------------------------------
+Disciplina 4.1 — AI-Driven DevOps, FinOps e Observabilidade
+Carga: 40h | Pré-requisito: 3.3
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+
+FUNDAMENTOS DE IA GENERATIVA PARA INFRAESTRUTURA
+- Arquitetura de LLMs para infra
+- APIs: OpenAI, Anthropic, AWS Bedrock
+- Frameworks: LangChain, CrewAI, AutoGen
+- RAG aplicado a documentação técnica
+
+IAC ASSISTIDO POR IA
+- Tradução NL → Infrastructure as Code
+- Geração de Terraform, Pulumi, Helm Charts
+- Validação: terraform plan, validate
+- Policy-as-Code: OPA, Sentinel
+- Detecção de drift
+
+AGENTES PARA KUBERNETES
+- Geração de YAML via NL
+- HPA/VPA inteligentes
+- Autoscaling baseado em workload
+- Rollout/rollback guiados por IA (canary, blue-green)
+- GitOps: Argo CD, Flux
+
+TROUBLESHOOTING ASSISTIDO
+- ReAct para diagnóstico estruturado
+- CrashLoopBackOff, ImagePullBackOff, OOMKilled
+- Análise de logs distribuídos e traces
+- Correlação Jaeger/Zipkin
+
+AIOPS E OBSERVABILIDADE
+- PromQL e LogQL a partir de NL
+- Dashboards Grafana contextualizados
+- Detecção de anomalias (Prophet, Isolation Forest)
+- Alertas preditivos
+
+CHATOPS
+- Bots para Slack, Discord, Teams
+- Comandos: /deploy, /scale, /rollback, /investigar
+- Workflows de aprovação com guardrails
+- RBAC e auditoria
+
+SEGURANÇA E COMPLIANCE
+- Scan IaC e containers (Snyk, Trivy, Checkov)
+- AI fix automático de vulnerabilidades
+- Detecção de secrets
+- Relatórios SOC2, ISO 27001, PCI-DSS
+
+CI/CD COPILOT
+- Pipelines GitLab CI, GitHub Actions, Jenkins
+- Gates inteligentes: SAST, DAST, dependency scanning
+- Análise de impacto em PRs
+- Rollback automático
+
+FINOPS
+- Estimativa de custos em PRs (Infracost)
+- Rightsizing de pods e nodes
+- Instâncias spot e reservadas
+- Detecção de zombie resources
+- Forecasting de custos
+
+RAG DE RUNBOOKS
+- Indexação de playbooks, READMEs, wikis
+- Agente que consulta e executa runbooks
+- Post-mortem blameless automatizado
+
+AUTO-REMEDIAÇÃO SEGURA
+- Playbooks acionados por alertas
+- Fluxo: alerta → verificação → mitigação → validação
+- Canary automático com rollback
+- Circuit breakers
+- Dry-run antes de produção
+- HITL para ações críticas
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Gerar IaC com IA
+2. Diagnosticar problemas em K8s com agentes
+3. Criar dashboards inteligentes
+4. Implementar ChatOps com aprovação
+5. Otimizar custos com FinOps
+6. Automatizar post-mortem
+
+🧪 PRÁTICAS
+- Prática 1: Copilot para geração de módulos Terraform validados
+- Prática 2: Agente para deployment end-to-end com readiness
+- Prática 3: Sistema de diagnóstico automático de pods
+- Prática 4: Dashboard inteligente com detecção de anomalias
+- Prática 5: Bot de ChatOps com fluxo de aprovação
+- Entrega: Dashboard + agente de diagnóstico
+
+--------------------------------------------------------------------------------
+Disciplina 4.2 — Segurança, Governança e Ética em IA
+Carga: 40h | Pré-requisito: 4.1
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+- O que é Governança em IA
+- Interpretabilidade e Explicabilidade
+- Vieses e Responsabilidade
+- Gerenciamento de Riscos:
+  - Aspectos Humanos e Éticos
+  - Segurança e Dados
+  - Aspectos Legais e Regulatórios
+- Custos Financeiros em IA
+- Guardrails e human-in-the-loop
+- Delimitação de escopo e ética na autonomia
+- Auditoria e rastreabilidade de decisões
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Explicar princípios de governança em IA
+2. Identificar e mitigar vieses
+3. Implementar guardrails
+4. Gerar relatórios de compliance
+5. Auditar decisões de agentes
+
+🧪 PRÁTICA
+- Implementar guardrails e HITL
+- Entrega: Relatório de compliance + checklist automatizado
+
+--------------------------------------------------------------------------------
+Disciplina 4.3 — Fine-Tuning e Processamento de Dados
+Carga: 40h | Pré-requisito: 4.2
+--------------------------------------------------------------------------------
+
+📚 EMENTA
+
+QUANDO FAZER FINE-TUNING (DECISION FRAMEWORK)
+- RAG vs fine-tuning vs prompt engineering
+
+PREPARAÇÃO DE DATASETS
+- Coleta de dados relevantes
+- Limpeza, balanceamento, padronização
+- Formato JSONL
+- Automação com Python
+
+FINE-TUNING VIA OPENAI API
+- Upload e train
+- Hiperparâmetros
+- Monitoramento
+- Versionamento e documentação
+
+LORA E PEFT
+- Low-Rank Adaptation
+- Parameter-Efficient Fine-Tuning
+- Trade-offs: desempenho vs eficiência
+- Full fine-tuned vs LoRA
+
+AVALIAÇÃO DE MODELOS
+- Métricas qualitativas e quantitativas
+- Precisão, consistência, adequação
+- Testes A/B
+- Overfitting e generalização
+
+PROJETO FINAL
+- Modelo customizado para domínio específico (atendimento, suporte, jurídico, financeiro)
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Decidir quando fazer fine-tuning
+2. Preparar datasets em JSONL
+3. Executar fine-tuning via API
+4. Aplicar LoRA/PEFT
+5. Avaliar modelos fine-tunados
+
+🧪 PRÁTICA
+- Fine-tuning de modelo para domínio automotivo
+- Entrega: Modelo customizado integrado a chatbot
+
+================================================================================
+🎯 CAPSTONE PROJECT — MICRO-SAAS AUTOINSIGHT
+Carga: 80h | Pré-requisito: Todas as disciplinas
+================================================================================
+
+📚 EMENTA COMPLETA
+
+UNIDADE 1 — IDEAÇÃO E ARQUITETURA DO MICRO-SAAS
+- Definição do problema e escopo
+- Análise de viabilidade: público-alvo e proposta de valor
+- Desenho da arquitetura: front-end, back-end, IA (RAG, Agentes, Orquestração)
+- Planejamento: milestones, backlog, stack
+
+UNIDADE 2 — FUNDAMENTOS DA SOLUÇÃO: RAG E AGENTES
+- Construção do core: sistema RAG
+- Seleção e configuração de Vector Databases
+- Desenvolvimento do agente principal
+- Entrega 1: Protótipo funcional do RAG com CLI
+
+UNIDADE 3 — ORQUESTRAÇÃO, BACK-END E INTERFACE INTELIGENTE
+- Desenvolvimento de APIs
+- Ponte IA-UI: MCP habilitado na aplicação
+- Orquestração multiagente com ADK
+- Entrega 2: API documentada + front-end com MCP habilitado
+
+UNIDADE 4 — FRONT-END, INTERAÇÃO E IMPLANTAÇÃO
+- UI em Angular com MCP
+- Integração com APIs de IA
+- Validação do MCP
+- Pipeline CI/CD e deploy
+- Entrega 3: Solução completa implantada
+
+UNIDADE 5 — APRESENTAÇÃO FINAL E DEFESA TÉCNICA
+- Storytelling + demonstração ao vivo
+- Defesa técnica: justificar decisões de arquitetura
+- Documentação: README, diagrama de arquitetura, instruções
+- Avaliação: complexidade, funcionalidade, qualidade, apresentação
+
+🎯 OBJETIVOS DE APRENDIZAGEM
+1. Consolidar todo o conhecimento em um produto real
+2. Conectar IA (RAG + Agentes) ao backend do AutoInsight
+3. Construir microsserviços com IA autônoma e segura
+4. Consumir regras de negócio do CRM
+5. Defender tecnicamente as escolhas
+
+🧪 ENTREGÁVEIS
+E1 — RAG + CLI funcional — Semana 4
+E2 — API + MCP habilitado — Semana 8
+E3 — Solução completa + deploy — Semana 12
+Defesa — Apresentação técnica — Semana 14
+
+================================================================================
+📊 MATRIZ CURRICULAR CONSOLIDADA
+================================================================================
+
+Semestre | Disciplina                          | Carga | Pré-req | Entrega
+---------|-------------------------------------|-------|---------|---------------------------
+1º       | 1.1 Fundamentos de IA, ML e LLMs    | 40h   | —       | CLI multi-modelo Ollama
+1º       | 1.2 Engenharia de Prompts Avançada  | 40h   | 1.1     | Prompt Library versionada
+1º       | 1.3 APIs de IA Generativa           | 40h   | 1.2     | API REST com LLM
+2º       | 2.1 RAG e Busca Semântica           | 40h   | 1.3     | RAG com pgvector
+2º       | 2.2 Model Context Protocol          | 40h   | 2.1     | MCP no VS Code
+2º       | 2.3 Arquitetura AI-First            | 40h   | 2.2     | Roteador de modelos
+3º       | 3.1 Agentes Autônomos               | 40h   | 2.3     | Agente ReAct
+3º       | 3.2 LangGraph e Workflows           | 40h   | 3.1     | Workflow em grafo
+3º       | 3.3 Sistemas Multiagente            | 40h   | 3.2     | Sistema cooperativo
+4º       | 4.1 AI-Driven DevOps/FinOps         | 40h   | 3.3     | Dashboard + agente
+4º       | 4.2 Segurança e Governança          | 40h   | 4.1     | Relatório compliance
+4º       | 4.3 Fine-Tuning                     | 40h   | 4.2     | Modelo customizado
+4º       | CAPSTONE                            | 80h   | Todas   | Micro-SaaS AutoInsight
+
+TOTAL: 480h
+
+================================================================================
+🛠️ STACK TECNOLÓGICO COMPLETO
+================================================================================
+
+Camada            | Tecnologias
+------------------|------------------------------------------------------------
+Linguagens        | Python (principal), TypeScript (front-end), SQL
+Backend           | FastAPI, SQLAlchemy, pgvector, Pydantic
+IA Local          | Ollama (Llama, Mistral, Qwen, Phi)
+IA Cloud          | OpenAI, Anthropic, Gemini, OpenRouter
+Orquestração      | LangChain, LangGraph, ADK
+MCP               | Python SDK, Continue (VS Code)
+Vector DB         | pgvector, Pinecone, Weaviate
+DevOps            | Docker, Kubernetes, Terraform, GitHub Actions, Argo CD
+Observabilidade   | Grafana, Prometheus, Jaeger, LangSmith
+Front-end         | Angular, Firebase AI Logic
+Fine-Tuning       | OpenAI API, LoRA, PEFT, Hugging Face
+
+================================================================================
+🧪 METODOLOGIA SOCRÁTICA
+================================================================================
+
+COMO FUNCIONA
+1. Perguntas guiadas sobre arquitetura
+   - Ex.: "Como você estruturaria o schema Pydantic para validar essa ferramenta que o agente vai usar?"
+2. Casos reais do mercado automotivo e CRM
+3. Apoio local (Linux + RTX 3060) para testar antes de APIs pagas
+
+ESTRUTURA DE CADA DISCIPLINA
+┌─────────────────────────────────────┐
+│  1. TEORIA (30%)                    │
+│     - Conceitos + perguntas         │
+│                                     │
+│  2. PRÁTICA GUIADA (40%)            │
+│     - Pair programming socrático    │
+│                                     │
+│  3. PROJETO AUTÔNOMO (30%)          │
+│     - Entrega + defesa              │
+└─────────────────────────────────────┘
+
+AVALIAÇÃO
+Componente               | Peso
+-------------------------|------
+Projetos por disciplina  | 40%
+Provas conceituais       | 20%
+Participação socrática   | 10%
+Capstone Project         | 30%
+
+================================================================================
+📅 CRONOGRAMA DETALHADO (24 MESES)
+================================================================================
+
+MÊS 1-2   │ Disciplina 1.1 — Fundamentos + Ollama
+MÊS 3-4   │ Disciplina 1.2 — Prompt Engineering
+MÊS 5-6   │ Disciplina 1.3 — APIs de IA
+          │ ─── PROVA SEMESTRAL 1 ───
+MÊS 7-8   │ Disciplina 2.1 — RAG + pgvector
+MÊS 9-10  │ Disciplina 2.2 — MCP
+MÊS 11-12 │ Disciplina 2.3 — Arquitetura AI-First
+          │ ─── PROVA SEMESTRAL 2 ───
+MÊS 13-14 │ Disciplina 3.1 — Agentes Autônomos
+MÊS 15-16 │ Disciplina 3.2 — LangGraph
+MÊS 17-18 │ Disciplina 3.3 — Multiagente
+          │ ─── PROVA SEMESTRAL 3 ───
+MÊS 19-20 │ Disciplina 4.1 — AI-Driven DevOps/FinOps
+MÊS 21    │ Disciplina 4.2 — Segurança e Governança
+MÊS 22    │ Disciplina 4.3 — Fine-Tuning
+MÊS 23-24 │ 🎯 CAPSTONE — Micro-SaaS AutoInsight
+          │ ─── DEFESA FINAL ───
+
+================================================================================
+🎓 CERTIFICAÇÃO
+================================================================================
+
+Ao final, o aluno recebe:
+- Diploma: Engenheiro de IA Aplicada
+- Portfólio: 12 projetos + Capstone funcional
+- Badges:
+  🏅 LLM Orchestrator
+  🏅 RAG Architect
+  🏅 MCP Developer
+  🏅 Agent Engineer
+  🏅 AI DevOps Specialist
+  🏅 Fine-Tuning Practitioner
+
+================================================================================
+🚀 PRÓXIMOS PASSOS
+================================================================================
+
+Sugiro começarmos agora pelo:
+
+📘 Disciplina 1.1 — Fundamentos de IA, ML e LLMs
+
+Semana 1:
+- Aula socrática: "O que é inteligência?"
+- Linha do tempo interativa
+- Setup do Ollama + RTX 3060
+
+Semana 2:
+- Arquitetura Transformer (com visualizações)
+- Prática: primeira chamada ao Llama 3 local
+- Exercício: comparar 3 modelos
+
+================================================================================
+FIM DO DOCUMENTO
+================================================================================

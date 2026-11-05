@@ -1,0 +1,47 @@
+HSP Collector Builder
+│
+├── interface/
+│   └── app.py
+│
+├── engine/
+│   ├── discovery.py
+│   ├── network.py
+│   ├── html_analyzer.py
+│   ├── pagination.py
+│   ├── vehicle_detector.py
+│   ├── field_detector.py
+│   ├── validator.py
+│   └── generator.py
+│
+├── schemas/
+│   └── meta_vehicle.py
+│
+├── collectors/
+│   └── generated/
+│
+├── investigations/
+│   └── ...
+│
+└── tests/
+
+New-Item -ItemType Directory -Path "interface", "engine", "schemas", "collectors/generated", "investigations", "tests"; New-Item -ItemType File -Path "interface/app.py", "engine/discovery.py", "engine/network.py", "engine/html_analyzer.py", "engine/pagination.py", "engine/vehicle_detector.py", "engine/field_detector.py", "engine/validator.py", "engine/generator.py", "schemas/meta_vehicle.py"
+
+
+Quase isso! Você compreendeu muito bem a lógica, mas vamos ajustar os termos exatos para você dominar o comando.
+Aqui está o que cada parte significa exatamente no PowerShell:
+• New-Item: É a ação. Significa "Criar um novo item" (pode ser uma pasta ou um arquivo).
+• -ItemType: É o parâmetro que pergunta "Que tipo de item você quer criar?".
+• Directory: É a resposta para o tipo de item. Significa "Uma Pasta" (Diretório). Se você quisesse criar um arquivo, usaria File.
+• -Path: É o parâmetro que diz "Em qual caminho/local?".
+• "interface", "engine"...: São os nomes das pastas que você está criando. Como você não digitou um caminho completo (como C:\Users\...), o PowerShell cria essas pastas diretamente dentro do local onde ele está aberto (que no seu caso é a pasta do seu projeto no VS Code).
+
+Resumo Scannable
+
+
+Termo	O que significa na prática?
+New-Item	Criar algo novo
+-ItemType Directory	Tipo do item = Pasta
+-ItemType File	Tipo do item = Arquivo
+-Path	No local / Com o nome de...
+
+Ficou claro como o PowerShell diferencia uma pasta de um arquivo usando o -ItemType? Se quiser, podemos criar o seu primeiro arquivo app.py com um código inicial de teste!
