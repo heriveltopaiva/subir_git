@@ -1,0 +1,1369 @@
+================================================================================
+MAN-WHATSAPP-BSUID-001_v1.0
+Manual Técnico Vivo — Nomes de Usuário e IDs de Usuário no Escopo da Empresa
+(BSUID) na Plataforma do WhatsApp Business
+================================================================================
+Código:      MAN-WHATSAPP-BSUID-001
+Projeto:     Integração WhatsApp Business Platform / Automação de Atendimento
+Tipo:        Manual técnico de referência e migração
+Idioma:      pt-BR
+Versão:      1.0 (primeira versão)
+Estado:      Parcial — análise documental; sem testes práticos registrados
+Data:        23 de out. de 2026
+Fontes:      SRC-001 (doc Meta "IDs do usuário no escopo da empresa",
+             atualizado em 15/set/2026, fornecido em dois arquivos idênticos)
+             SRC-002 (conversa "Meta Configuração", 23/out/2026)
+             SRC-003 (doc "Tráfego de resposta direta" — contexto de negócio)
+             SRC-004 (Instruções do GPT — Manuais Técnicos Vivos, v3.0)
+Relações:    MAN-MARKETING-DIRECTRESPONSE-001 (contexto de projeto)
+================================================================================
+
+NOTA DE FIDELIDADE
+Este manual foi produzido por análise documental (documento, tema e seção),
+não linha a linha. Trechos marcados como "Original" preservam o texto da
+fonte; os demais são explicação/interpretação. Nenhum teste prático foi
+executado; nada aqui foi validado em ambiente real.
+
+--------------------------------------------------------------------------------
+1. VISÃO GERAL
+--------------------------------------------------------------------------------
+
+O WhatsApp passou a permitir nomes de usuário opcionais (ex.: @joaosilva).
+Quando um usuário adota um nome de usuário, o número de telefone dele pode
+deixar de aparecer nos webhooks enviados às empresas. Para que as empresas
+continuem identificando e respondendo esses usuários, a Meta criou um novo
+identificador de back-end: o BSUID — Business-Scoped User ID (ID do usuário no
+escopo da empresa).
+
+Em cinco linhas:
+1. Nomes de usuário são opcionais para pessoas e empresas.
+2. Quando adotados por um usuário, o telefone pode ser omitido dos webhooks.
+3. O BSUID identifica o usuário de forma única DENTRO de um portfólio empresarial.
+4. O suporte a BSUID é OBRIGATÓRIO para parceiros, empresas integradas
+   diretamente na Plataforma do WhatsApp Business e anunciantes de CTWA.
+5. Quem não migrar pode PERDER a capacidade de processar mensagens — não há
+   correção retroativa.
+
+Escopo: entender o BSUID, onde ele aparece, como enviar mensagens para ele,
+como recuperar o telefone do usuário e o que fazer para migrar integrações.
+Fora do escopo: detalhes internos da Meta, preços, políticas não documentadas.
+
+--------------------------------------------------------------------------------
+2. MAPA DO SISTEMA
+--------------------------------------------------------------------------------
+
+Usuário do WhatsApp
+   |  (pode ou não adotar @username)
+   v
+Plataforma do WhatsApp Business (Meta)
+   |
+   +-- Webhooks ------------> Sua integração (CRM, bot, n8n, backend)
+   |    - messages (recebidas, status)
+   |    - contacts
+   |    - system (troca de número/BSUID)
+   |    - user_preferences
+   |    - history / smb_message_echoes / smb_app_state_sync
+   |    - groups / group_participants_update
+   |    - calls (API de Ligações / SIP)
+   |    - business_username_updates
+   |
+   +-- APIs ----------------> Sua integração envia mensagens/ligações
+   |    - Messages API (to | recipient)
+   |    - Marketing Messages API
+   |    - Groups API
+   |    - Block Users API
+   |    - Calls API (SIP)
+   |    - Username API
+   |    - Contact Book API
+   |    - Parent BSUID Accounts API
+   |
+   +-- Contact Book (hospedado pela Meta)
+        - Armazena telefone + BSUID após interação
+        - Preenche webhooks com o telefone quando disponível
+
+Fluxo de identificação de um usuário:
+
+Mensagem recebida
+   |
+   +-- user_id / from_user_id      -> SEMPRE presente (BSUID)
+   +-- parent_user_id              -> se BSUID principal habilitado
+   +-- username                    -> se o usuário adotou nome de usuário
+   +-- wa_id / from / recipient_id -> SÓ se o telefone estiver disponível
+                                      (cache de 30 dias OU Contact Book)
+
+--------------------------------------------------------------------------------
+3. GLOSSÁRIO
+--------------------------------------------------------------------------------
+
+BSUID
+  Business-Scoped User ID. Identificador único de um usuário do WhatsApp,
+  vinculado a um portfólio empresarial específico. Formato:
+  US.13491208655302741918 (código ISO 3166 alfa-2 + ponto + até 128
+  caracteres alfanuméricos).
+
+BSUID principal / Parent BSUID
+  BSUID compartilhado entre portfólios empresariais inscritos na mesma conta
+  principal. Formato com ENT: US.ENT.11815799212886844830. Requer inscrição
+  junto ao contato da Meta.
+
+Portfólio empresarial
+  Antigo "Gerenciador de Negócios" (Business Manager). Os BSUIDs são
+  associados a portfólios individuais.
+
+Nome de usuário (username)
+  Nome único e opcional que o usuário define para exibir no app em vez do
+  número de telefone.
+
+Nome de usuário comercial
+  Nome de usuário adotado por uma empresa. NÃO oculta o telefone comercial
+  no app.
+
+Contact Book (Lista de Contatos)
+  Recurso hospedado pela Meta que armazena telefone + BSUID de usuários após
+  interação. Preenche webhooks com o telefone.
+
+REQUEST_CONTACT_INFO
+  Novo tipo de botão (em templates utility/marketing ou mensagem interativa)
+  que solicita ao usuário o compartilhamento do telefone.
+
+CTWA
+  Click-to-WhatsApp Ads — anúncios que levam o usuário diretamente ao
+  WhatsApp.
+
+Webhook
+  Chamada HTTP enviada pela Meta à sua integração quando ocorre um evento
+  (mensagem recebida, status, etc.).
+
+wa_id
+  Campo de webhook que historicamente continha o número de telefone do
+  usuário. Agora PODE SER OMITIDO.
+
+user_id
+  Novo campo de webhook que contém o BSUID. SEMPRE PRESENTE.
+
+parent_user_id
+  Campo de webhook que contém o BSUID principal, quando habilitado.
+
+Cache de 30 dias
+  Janela em que o telefone do usuário continua sendo incluído em webhooks se
+  houve interação recente (avaliada POR NÚMERO COMERCIAL).
+
+SIP
+  Session Initiation Protocol — protocolo usado pela API de Ligações.
+
+--------------------------------------------------------------------------------
+4. MÓDULOS / COMPONENTES
+--------------------------------------------------------------------------------
+
+4.1 MÓDULO: NOMES DE USUÁRIO (USUÁRIO FINAL)
+
+Função:    permitir que usuários do WhatsApp exibam um nome único em vez do
+           telefone.
+Motivo:    privacidade e personalização.
+Entradas:  username definido pelo usuário no app.
+Processo:  a Meta passa a incluí-lo no campo username dos webhooks.
+Saídas:    webhooks com username presente; telefone pode ser omitido.
+Riscos:    integrações que assumem wa_id sempre presente quebram.
+
+Original (SRC-001):
+  "O nome de usuário é um nome único e opcional que os usuários do WhatsApp
+   podem definir para exibir no app em vez do número de telefone. Em vez dos
+   nomes de perfil, é possível usar os nomes de usuário para personalizar o
+   conteúdo de mensagens para usuários individuais."
+
+  "Os usuários do WhatsApp podem ter apenas um nome de usuário, mas é
+   possível alterá-lo periodicamente. A alteração do nome de usuário não
+   afeta o número de telefone nem o ID do usuário no escopo da empresa."
+
+4.2 MÓDULO: BSUID (BUSINESS-SCOPED USER ID)
+
+Função:    identificar unicamente um usuário do WhatsApp dentro de um
+           portfólio empresarial.
+Motivo:    permitir envio e recebimento de mensagens mesmo sem o telefone.
+Entradas:  gerado automaticamente pela Meta.
+Processo:  atribuído ao campo user_id em todos os webhooks de mensagens.
+Saídas:    envio de mensagens via recipient; identificação de usuários sem
+           telefone.
+Riscos:
+  - BSUID é único por par usuário + portfólio; enviar de outro portfólio falha.
+  - BSUID é regerado quando o usuário troca de número (dispara webhook de
+    sistema).
+  - BSUIDs NÃO podem ser usados em templates de autenticação de um toque,
+    sem toque e de copiar código (exigem telefone).
+
+Original (SRC-001):
+  "Um BSUID é um identificador de usuário único que pode ser usado para
+   enviar mensagens a um usuário do WhatsApp quando você não sabe o número
+   de telefone dele. O BSUID será atribuído ao parâmetro user_id e aparecerá
+   em todos os webhooks de mensagens, independentemente de o usuário ter
+   habilitado ou não o recurso de nome de usuário."
+
+  "Os BSUIDs são associados a portfólios empresariais individuais. Isso
+   significa que qualquer número de telefone comercial de um determinado
+   portfólio pode ser usado para enviar mensagens a um BSUID no mesmo
+   portfólio. As tentativas de enviar mensagens ao BSUID usando um número de
+   telefone de um portfólio diferente não terão sucesso."
+
+Características (Original, SRC-001):
+  "Os BSUIDs serão:
+   - gerados automaticamente
+   - prefixados com o código do país ISO 3166 alfa-2 de duas letras do
+     usuário e um ponto, seguido de até 128 caracteres alfanuméricos (por
+     exemplo, US.13491208655302741918)
+   - únicos para cada par de usuário e portfólio empresarial (antes chamados
+     de Gerenciadores de Negócios)
+   - gerados novamente se um usuário mudar o número de telefone (o que
+     dispara um webhook de mensagens do sistema)"
+
+4.3 MÓDULO: BSUID PRINCIPAL (PARENT BSUID)
+
+Função:    permitir que um mesmo usuário seja identificado por um único BSUID
+           em VÁRIOS portfólios de uma empresa gerenciada.
+Motivo:    empresas com múltiplos portfólios precisam de identidade unificada.
+Pré-req.:  pedir ao ponto de contato da Meta para verificar se a organização
+           se qualifica e inscrever os portfólios.
+Entradas:  inscrição aprovada pela Meta.
+Processo:  Meta inclui parent_user_id em todos os webhooks.
+Saídas:    envio via recipient com BSUID principal; webhooks com
+           parent_user_id e parent_recipient_user_id / from_parent_user_id.
+Riscos:
+  - NÃO é suportado em bloqueio/desbloqueio de usuários (a solicitação falha).
+  - NÃO é suportado na Contact Book (a solicitação falha com erro, em vez de
+    retornar present: false).
+  - Requer inscrição; não é automático.
+
+Original (SRC-001):
+  "Caso seja uma empresa gerenciada e queira inscrever seus portfólios
+   empresariais para receber BSUIDs principais, você pode pedir ao seu ponto
+   de contato da Meta para verificar se a organização se qualifica. Se você
+   se qualificar e os portfólios empresariais forem inscritos, os BSUIDs
+   principais serão incluídos em todos os webhooks de mensagens, atribuídos
+   a uma nova propriedade parent_user_id."
+
+  "Os BSUIDs principais seguem o mesmo formato dos BSUIDs normais, mas
+   incluem ENT entre o código do país e o identificador alfanumérico (por
+   exemplo, US.ENT.11815799212886844830)."
+
+4.4 MÓDULO: CONTACT BOOK (LISTA DE CONTATOS)
+
+Função:    armazenar telefone + BSUID de usuários que interagiram com a
+           empresa, para preencher webhooks com o telefone.
+Motivo:    reduzir a perda de contexto quando o usuário adota nome de
+           usuário.
+Entradas:  interações (mensagem/ligação) após o lançamento do recurso;
+           botão REQUEST_CONTACT_INFO.
+Processo:  a Meta armazena automaticamente; não requer integração.
+Saídas:    webhooks passam a incluir o telefone novamente.
+Riscos:
+  - Escopo POR PORTFÓLIO; não sincroniza entre portfólios inscritos no mesmo
+    BSUID principal.
+  - Interações ANTERIORES ao lançamento NÃO são capturadas retroativamente.
+  - Desativar o recurso APAGA os dados já salvos; reativar não restaura.
+  - Só preenche cargas de webhook, não respostas de API.
+
+Original (SRC-001):
+  "Para auxiliar na continuidade das conversas, oferecemos um recurso de
+   lista de contatos que armazena informações de contato de usuários do
+   WhatsApp. O livro de contatos é fornecido e hospedado pela Meta. Não é
+   necessária nenhuma integração."
+
+  "Os dados da lista de contatos serão mantidos até você desabilitar o
+   recurso ou desativar a conta. Se desejar, você poderá desabilitar esse
+   recurso no painel Meta Business Suite > Configurações da empresa >
+   Informações da empresa."
+
+Limitação (Original, SRC-001):
+  "As listas de contatos são associadas aos portfólios empresariais. Isso
+   significa que, se você tiver vários portfólios inscritos na mesma conta
+   do BSUID principal, o número de telefone e o BSUID de um usuário terão
+   que ser registrados no livro de contatos de cada portfólio de forma
+   independente, já que as informações de contato do usuário não são
+   compartilhadas ou sincronizadas entre portfólios inscritos."
+
+4.5 MÓDULO: BOTÃO REQUEST_CONTACT_INFO
+
+Função:    solicitar ao usuário que compartilhe o próprio telefone.
+Motivo:    obter o telefone quando ele não está disponível nos webhooks.
+Entradas:  template utility/marketing com botão REQUEST_CONTACT_INFO OU
+           mensagem interativa request_contact_info.
+Processo:  usuário toca no botão; dispara webhook contacts.
+Saídas:    webhook com phones[].phone, origin: contact_request; se o usuário
+           compartilhar contato manualmente, origin: other e vcard.
+Riscos:
+  - O rótulo do botão NÃO pode ser personalizado.
+  - Se o usuário NÃO compartilhar o telefone, é preciso tratar esse cenário.
+
+Original (SRC-001):
+  "Para facilitar a solicitação de números de telefone de usuários do
+   WhatsApp, está disponível um novo tipo de botão REQUEST_CONTACT_INFO que
+   pode ser incluído nos modelos utility e marketing ou enviado como uma
+   mensagem interativa."
+
+  "Os botões de pedido de informações de contato não podem ser
+   personalizados. Portanto, não é preciso incluir valores de parâmetro ao
+   enviar o modelo"
+
+4.6 MÓDULO: NOMES DE USUÁRIO COMERCIAIS (EMPRESA)
+
+Função:    permitir que a empresa adote um nome de usuário pesquisável.
+Motivo:    identificador único e pesquisável; usuários finais não podem
+           pesquisar por nome de exibição.
+Entradas:  username desejado; opcionalmente transfer_action
+           (none | force_transfer).
+Processo:  POST na Username API; aprovação da Meta.
+Saídas:    status: approved ou reserved.
+Riscos:
+  - Formato restrito: 3–35 caracteres; apenas a-z, 0-9, . e _; sem acentos;
+    não começar/terminar com ponto; não começar com www.; não terminar com
+    domínio.
+  - Um username = um número comercial; único no WhatsApp inteiro.
+  - Se o username já é usado na Página do Facebook ou conta do Instagram, é
+    preciso vincular o telefone à Página/Conta.
+  - NÃO oculta o telefone comercial no app.
+
+Original (SRC-001):
+  "As empresas também poderão adotar um nome de usuário comercial. No
+   entanto, se você adotar um nome de usuário comercial, o número de
+   telefone da empresa não ficará oculto no cliente do WhatsApp ou do
+   WhatsApp Business."
+
+  "Cada nome de usuário comercial é mapeado para um único número de telefone
+   comercial em todo o WhatsApp. Ou seja, um número de telefone pode ter
+   apenas um nome de usuário por vez."
+
+Prioridade de exibição (Original, SRC-001):
+  "A prioridade a seguir será observada (em ordem decrescente de prioridade)
+   para a exibição de informações do perfil comercial nas janelas de
+   conversa no app. Os números de telefone comerciais sempre aparecerão no
+   seu perfil empresarial.
+   1. Nome salvo do contato
+   2. Nome comercial verificado ou nome da conta comercial oficial
+   3. Nome de usuário
+   4. Número de telefone"
+
+4.7 MÓDULO: WEBHOOKS DE SISTEMA (TROCA DE NÚMERO/BSUID)
+
+Função:    notificar a integração quando o usuário troca de número ou quando
+           o BSUID muda.
+Motivo:    manter o vínculo entre a identidade antiga e a nova no CRM.
+Entradas:  ação do usuário no app.
+Processo:  webhook messages com type: system.
+Saídas:
+  - system.type = user_changed_number — quando o novo telefone pode ser
+    compartilhado; contém previous_user_id e previous_parent_user_id.
+  - system.type = user_changed_user_id — quando só a mudança de BSUID pode
+    ser relatada; wa_id é omitido.
+Riscos:    não existe campo de webhook user_id_update assinável; a mudança
+           chega em messages como system.
+
+Original (SRC-001):
+  "Adição de um novo gatilho: agora um webhook de mensagens do sistema será
+   disparado quando um usuário do WhatsApp alterar o número de telefone
+   usando o app para consumidores."
+
+  "Não existe um campo de webhook user_id_update. As alterações de BSUID são
+   entregues no campo messages como uma mensagem do sistema."
+
+4.8 MÓDULO: WEBHOOK BUSINESS_USERNAME_UPDATES
+
+Função:    notificar mudanças de status do nome de usuário comercial.
+Motivo:    acompanhar aprovação, reserva, exclusão e revogação.
+Entradas:  mudança de status na Meta.
+Processo:  webhook no campo business_username_updates.
+Saídas:    status (approved | deleted | reserved) e context (revoked, quando
+           aplicável).
+Riscos:    context ausente não identifica quem iniciou a mudança.
+
+Original (SRC-001):
+  "Um novo webhook business_username_updates será adicionado. Esse webhook
+   será disparado quando o status do nome de usuário de uma empresa for
+   alterado."
+
+  "context – Contexto adicional sobre o motivo pelo qual o nome de usuário
+   atingiu o estado denunciado por status. É exibido apenas quando há algo
+   para informar além do próprio status. No momento, revoked é o único
+   valor."
+
+--------------------------------------------------------------------------------
+5. PROCEDIMENTOS
+--------------------------------------------------------------------------------
+
+5.1 PROC-001 — ENTENDER ONDE O BSUID APARECE
+
+Objetivo:  saber em quais campos de webhook e API o BSUID é retornado.
+Uso:       planejamento de integração e ajuste de parsers.
+Pré-req.:  acesso à documentação e ao Painel de Apps.
+Entradas:  documentação (SRC-001).
+Passos:
+  1. Em mensagens recebidas, procure contacts[].user_id e
+     messages[].from_user_id. Sempre presentes.
+  2. Em status de mensagens de saída (sent/delivered/read), procure
+     contacts[].user_id e statuses[].recipient_user_id. Sempre presentes.
+  3. Em status failed, contacts é omitido e recipient_user_id é omitido se a
+     mensagem foi enviada ao telefone.
+  4. Em contatos (compartilhamento), procure contacts[].user_id e
+     messages[].from_user_id.
+  5. Em mensagens do sistema, procure system.user_id,
+     system.previous_user_id, system.parent_user_id,
+     system.previous_parent_user_id.
+  6. Em grupos, procure participants[].user_id,
+     recipient_participant_user_id, from_user_id, from_parent_user_id.
+  7. Em ligações, procure from_user_id / to_user_id / recipient_user_id e
+     variantes parent.
+  8. Em respostas de envio, procure contacts[].user_id (omitido quando o
+     envio foi por telefone).
+Saída:     mapa de campos por tipo de webhook.
+Validação: comparar com as tabelas de referência rápida da Seção 6.
+Falhas:    assumir que wa_id sempre existe.
+Riscos:    parsers antigos quebram ao receber payload sem telefone.
+Fontes:    SRC-001 (seções "Referência rápida sobre identificadores de
+           webhook", "Webhooks de mensagens", "API de Grupos",
+           "API de Ligações").
+Estado:    documentado; não testado.
+
+Original (SRC-001, tabela de webhooks de mensagens recebidas):
+
+  Identificador    | O usuário tem um nome de usuário         | O usuário não tem
+  -----------------+------------------------------------------+------------------
+  wa_id            | Incluído se o número de telefone estiver | Sempre incluído
+                   | disponível conforme as condições de      |
+                   | Números de telefone                      |
+  user_id          | Sempre incluído                          | Sempre incluído
+  parent_user_id   | Incluído se os BSUIDs principais         | Incluído se os
+                   | estiverem habilitados                    | BSUIDs principais
+                   |                                          | estiverem habilitados
+  username         | Sempre incluído                          | Não incluído
+
+Original (SRC-001, tabela de webhooks de status de mensagens de saída):
+
+  Identificador             | Enviado para o telefone | Enviado para o BSUID
+  --------------------------+-------------------------+---------------------
+  wa_id                     | Sempre incluído         | Incluído se o número
+                            |                         | de telefone estiver
+                            |                         | disponível conforme as
+                            |                         | condições de Números
+                            |                         | de telefone
+  user_id                   | Sempre incluído         | Sempre incluído
+  recipient_user_id         | Sempre incluído         | Sempre incluído
+  parent_user_id            | Incluído se os BSUIDs   | Incluído se os BSUIDs
+                            | principais estiverem    | principais estiverem
+                            | habilitados             | habilitados
+  recipient_parent_user_id  | Incluído se os BSUIDs   | Incluído se os BSUIDs
+                            | principais estiverem    | principais estiverem
+                            | habilitados             | habilitados
+  username                  | Incluído em entregue/   | Incluído em entregue/
+                            | lido se o usuário tiver | lido se o usuário tiver
+                            | um nome de usuário      | um nome de usuário
+
+5.2 PROC-002 — ENVIAR MENSAGEM USANDO BSUID
+
+Objetivo:  enviar mensagem a um usuário sem saber o telefone.
+Uso:       quando o webhook trouxe apenas user_id.
+Pré-req.:  API compatível com BSUID (a partir de julho de 2026); BSUID do
+           mesmo portfólio do número comercial remetente.
+Entradas:  recipient (BSUID ou BSUID principal) OU to (telefone), nunca
+           ambos com intenção de usar o BSUID (telefone tem precedência).
+Passos:
+  1. Monte a requisição para POST
+     https://graph.facebook.com/<API_VERSION>/<BUSINESS_PHONE_NUMBER_ID>/messages
+  2. Inclua "messaging_product": "whatsapp" e
+     "recipient_type": "individual".
+  3. Para enviar SÓ COM BSUID: defina "recipient": "<BSUID>" e OMITA to.
+  4. Para enviar SÓ COM TELEFONE: defina "to": "<PHONE>" e OMITA recipient.
+  5. Para enviar COM AMBOS: defina os dois; o telefone tem precedência.
+  6. Verifique a resposta: se enviado por BSUID, contacts[].input e
+     contacts[].user_id retornam o BSUID e wa_id é omitido.
+Saída:     mensagem aceita pela API.
+Validação: resposta HTTP 200 com messages[].id; contacts[].user_id presente
+           quando envio por BSUID.
+Falhas:
+  - Código 131062 — Business-scoped User ID (BSUID) recipients are not
+    supported for this message.
+  - Templates de autenticação (um toque, sem toque, copiar código) NÃO
+    aceitam BSUID.
+  - BSUID de outro portfólio falha.
+Riscos:    enviar to e recipient achando que o BSUID será usado — o telefone
+           vence.
+Fontes:    SRC-001 (seções "Como enviar pedidos de contato", "Como enviar
+           solicitações de mensagem de marketing", "Códigos de erro").
+Estado:    documentado; não testado.
+
+Original (SRC-001):
+  {
+    "messaging_product": "whatsapp",
+    "recipient_type": "individual",
+    "to": "<USER_PHONE_NUMBER>",
+    "recipient": "<BSUID>",
+    "type": "text",
+    "text": {
+      "body": "<BODY_TEXT>"
+    }
+  }
+
+Original (SRC-001, resposta ao enviar para BSUID):
+  {
+    "messaging_product": "whatsapp",
+    "contacts": [
+      {
+        "input": "US.13491208655302741918",
+        "user_id": "US.13491208655302741918"
+      }
+    ],
+    "messages": [
+      {
+        "id": "wamid.HBgLMTY0NjcwNDM1OTUVAgARGBI1RjQyNUE3NEYxMzAzMzQ5MkEA"
+      }
+    ]
+  }
+
+5.3 PROC-003 — RECUPERAR O TELEFONE DO USUÁRIO NOS WEBHOOKS
+
+Objetivo:  fazer o telefone voltar a aparecer nos webhooks quando o usuário
+           adotou nome de usuário.
+Uso:       manter o contexto da conversa no CRM.
+Pré-req.:  Contact Book ativado (Meta Business Suite > Configurações da
+           empresa > Informações da empresa).
+Entradas:  interação recente ou entrada no Contact Book.
+Passos:
+  1. Verifique se o Contact Book está ativado.
+  2. Garanta que houve interação (mensagem/ligação) APÓS o lançamento do
+     recurso; interações anteriores não são capturadas.
+  3. Confira a presença do telefone com GET .../contact_book?
+     messaging_product=whatsapp&bsuid=<BSUID>.
+  4. Se present: true, os próximos webhooks daquele BSUID voltarão a incluir
+     o telefone.
+  5. Se present: false, solicite o telefone via botão REQUEST_CONTACT_INFO
+     (PROC-004).
+Saída:     wa_id / from / recipient_id incluídos nos webhooks.
+Validação: resposta com present: true.
+Falhas:
+  - present: false para BSUID inválido, de outro portfólio ou antigo
+    (regerado).
+  - BSUID principal NÃO é suportado na Contact Book (a solicitação falha com
+    erro).
+Riscos:    desativar o Contact Book apaga os dados salvos; reativar não
+           restaura.
+Fontes:    SRC-001 (seções "Números de telefone", "Lista de contatos",
+           "Verificar uma entrada na agenda de contatos").
+Estado:    documentado; não testado.
+
+Condições de inclusão do telefone (Original, SRC-001):
+  "Para reduzir o risco de perda do contexto de conversas com usuários
+   existentes que habilitarem o recurso de nomes de usuário, os números de
+   telefone dos usuários serão incluídos em webhooks se alguma das seguintes
+   condições for atendida:
+   - Você enviou mensagem ou ligou para o número de telefone do usuário em
+     até 30 dias após o disparo do webhook
+   - Você recebeu uma mensagem ou ligação do número de telefone do usuário
+     em até 30 dias após o disparo do webhook
+   - O usuário está na sua lista de contatos"
+
+  "As condições de retrospectiva de 30 dias mencionadas acima são avaliadas
+   por número de telefone comercial."
+
+Original (SRC-001, verificação na Contact Book):
+  curl 'https://graph.facebook.com/<API_VERSION>/<BUSINESS_PHONE_NUMBER_ID>/contact_book?messaging_product=whatsapp&bsuid=<BSUID>' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>'
+
+  {
+    "messaging_product": "whatsapp",
+    "contacts": [
+      {
+        "bsuid": "<BSUID>",
+        "present": <PRESENT?>
+      }
+    ]
+  }
+
+5.4 PROC-004 — SOLICITAR O TELEFONE COM REQUEST_CONTACT_INFO
+
+Objetivo:  obter o telefone quando ele não está disponível.
+Uso:       jornada de atendimento (bot) que precisa do telefone para
+           prosseguir.
+Pré-req.:  template utility/marketing aprovado OU mensagem interativa.
+Entradas:  template com botão REQUEST_CONTACT_INFO ou mensagem interativa
+           request_contact_info.
+Passos:
+  1. Crie o template com o botão (ver Original abaixo) OU monte a mensagem
+     interativa.
+  2. Envie o template/mensagem ao usuário (por to ou recipient).
+  3. Aguarde o webhook contacts.
+  4. No webhook, leia messages[].contacts[].phones[].phone e
+     messages[].contacts[].origin:
+     - origin: contact_request -> usuário tocou no botão.
+     - origin: other -> usuário compartilhou contato manualmente; vcard
+       presente.
+  5. Trate o caso em que o usuário NÃO compartilha o telefone.
+Saída:     telefone do usuário disponível no webhook contacts.
+Validação: webhook contacts recebido com phones[].phone.
+Falhas:    botão não pode ser personalizado; se o usuário ignorar, não há
+           telefone.
+Riscos:    depender exclusivamente do botão sem tratar a recusa.
+Fontes:    SRC-001 (seções "Como solicitar o número de telefone dos
+           usuários", "Uso de modelos", "Uso de mensagens interativas",
+           "Webhook de contatos").
+Estado:    documentado; não testado.
+
+Original (SRC-001, criação de template):
+  curl 'https://graph.facebook.com/<API_VERSION>/<WHATSAPP_BUSINESS_ACCOUNT_ID>/message_templates' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  -d '
+  {
+    "name": "<TEMPLATE_NAME>",
+    "language": "<TEMPLATE_LANGUAGE>",
+    "category": "utility",
+    "components": [
+      {
+        "type": "body",
+        "text": "<BODY_TEXT>"
+      },
+      {
+        "type": "buttons",
+        "buttons": [
+          {
+            "type": "REQUEST_CONTACT_INFO"
+          }
+        ]
+      }
+    ]
+  }'
+
+Original (SRC-001, mensagem interativa):
+  curl 'https://graph.facebook.com/<API_VERSION>/<BUSINESS_PHONE_NUMBER_ID>/messages' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  -d '
+  {
+    "messaging_product": "whatsapp",
+    "recipient_type": "individual",
+    "recipient": "<BSUID>",
+    "type": "interactive",
+    "interactive": {
+      "type": "request_contact_info",
+      "body": {
+        "text": "<BODY_TEXT>"
+      },
+      "action": {
+        "name": "request_contact_info"
+      }
+    }
+  }'
+
+5.5 PROC-005 — ADOTAR OU ALTERAR UM NOME DE USUÁRIO COMERCIAL
+
+Objetivo:  registrar o username da empresa.
+Uso:       marca pesquisável no WhatsApp.
+Pré-req.:  número comercial registrado na API; portfólio com limite de
+           mensagens alto (erro 147002); Página do Facebook/Instagram
+           vinculada se o username já for usado lá.
+Entradas:  username desejado; transfer_action opcional.
+Passos:
+  1. (Opcional) Consulte usernames reservados com GET .../username_suggestions.
+  2. Faça POST .../username com username e, se necessário, transfer_action.
+  3. Se o username já estiver em uso em outro número do mesmo portfólio,
+     reenvie com transfer_action: force_transfer.
+  4. Verifique o status retornado: approved ou reserved.
+  5. Consulte o username atual com GET .../username.
+  6. Para excluir, use DELETE .../username.
+Saída:     username aprovado/reservado.
+Validação: GET .../username retorna o username e o status.
+Falhas:    códigos 10, 33, 100, 147001, 147002, 147003, 147004, 147005,
+           133010 (ver tabela na Seção 7).
+Riscos:    username reservado não fica visível até o recurso ser
+           disponibilizado para todos.
+Fontes:    SRC-001 (seções "Como adotar ou alterar um nome de usuário
+           comercial", "Como obter o nome de usuário atual", "Como obter
+           nomes de usuário reservados", "Como excluir um nome de usuário").
+Estado:    documentado; não testado.
+
+Original (SRC-001, adoção):
+  curl -X POST 'https://graph.facebook.com/<API_VERSION>/<BUSINESS_PHONE_NUMBER_ID>/username' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>' \
+  -d '
+  {
+    "username": "<DESIRED_USERNAME>",
+    "transfer_action": "<TRANSFER_ACTION>"
+  }'
+
+Original (SRC-001, resposta de sucesso):
+  {
+    "status": "<STATUS>"
+  }
+
+Original (SRC-001, consulta):
+  curl 'https://graph.facebook.com/<API_VERSION>/<BUSINESS_PHONE_NUMBER_ID>/username' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>'
+
+  {
+    "username": "<USERNAME>",
+    "status": "<STATUS>"
+  }
+
+5.6 PROC-006 — TRATAR TROCA DE NÚMERO/BSUID (WEBHOOKS DE SISTEMA)
+
+Objetivo:  manter o vínculo entre o BSUID antigo e o novo no CRM.
+Uso:       quando o usuário troca de número no app.
+Pré-req.:  assinatura no campo messages.
+Entradas:  webhook messages com type: system.
+Passos:
+  1. Ao receber messages[].type = "system", leia system.type.
+  2. Se system.type = user_changed_number: o novo telefone pode ser
+     compartilhado; leia system.user_id (novo BSUID), system.previous_user_id
+     (antigo), system.wa_id (novo telefone, se disponível).
+  3. Se system.type = user_changed_user_id: só a mudança de BSUID é
+     relatada; wa_id é omitido; leia system.user_id e
+     system.previous_user_id.
+  4. Atualize o CRM: associe previous_user_id ao novo user_id.
+  5. Se BSUID principal habilitado, leia também parent_user_id e
+     previous_parent_user_id.
+Saída:     CRM atualizado com o novo BSUID.
+Validação: previous_user_id mapeado para user_id.
+Falhas:    não existe campo user_id_update assinável; a mudança chega em
+           messages.
+Riscos:    perder o vínculo e tratar o usuário como novo.
+Fontes:    SRC-001 (seções "Webhooks de mensagens do sistema",
+           "user_id_update webhooks").
+Estado:    documentado; não testado.
+
+Original (SRC-001, user_changed_number):
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "<WHATSAPP_BUSINESS_ACCOUNT_ID>",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "<BUSINESS_DISPLAY_PHONE_NUMBER>",
+                "phone_number_id": "<BUSINESS_PHONE_NUMBER_ID>"
+              },
+              "messages": [
+                {
+                  "from": "<WHATSAPP_USER_PHONE_NUMBER>",
+                  "id": "<WHATSAPP_MESSAGE_ID>",
+                  "timestamp": "<WEBHOOK_TRIGGER_TIMESTAMP>",
+                  "type": "system",
+                  "system": {
+                    "body": "User...",
+                    "wa_id": "<NEW_WHATSAPP_USER_ID>",
+                    "user_id": "<NEW_BSUID>",
+                    "parent_user_id": "<NEW_PARENT_BSUID>",
+                    "type": "<SYSTEM_CHANGE_TYPE>"
+                  }
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  }
+
+Original (SRC-001, user_changed_user_id):
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "<WHATSAPP_BUSINESS_ACCOUNT_ID>",
+        "changes": [
+          {
+            "value": {
+              "messaging_product": "whatsapp",
+              "metadata": {
+                "display_phone_number": "<BUSINESS_DISPLAY_PHONE_NUMBER>",
+                "phone_number_id": "<BUSINESS_PHONE_NUMBER_ID>"
+              },
+              "messages": [
+                {
+                  "from": "<WHATSAPP_USER_PHONE_NUMBER>",
+                  "id": "<WHATSAPP_MESSAGE_ID>",
+                  "timestamp": "<WEBHOOK_TRIGGER_TIMESTAMP>",
+                  "type": "system",
+                  "system": {
+                    "body": "User changed from <OLD_BSUID> to <NEW_BSUID>",
+                    "wa_id": "<WHATSAPP_USER_PHONE_NUMBER>",
+                    "user_id": "<NEW_BSUID>",
+                    "previous_user_id": "<OLD_BSUID>",
+                    "parent_user_id": "<NEW_PARENT_BSUID>",
+                    "previous_parent_user_id": "<OLD_PARENT_BSUID>",
+                    "type": "user_changed_user_id"
+                  }
+                }
+              ]
+            },
+            "field": "messages"
+          }
+        ]
+      }
+    ]
+  }
+
+5.7 PROC-007 — TESTAR CENÁRIOS DE USERNAME NO PAINEL DE APPS
+
+Objetivo:  validar a integração sem esperar um usuário real.
+Uso:       antes de colocar em produção.
+Pré-req.:  app no Painel de Apps.
+Passos:
+  1. Acesse Painel de Apps > Casos de uso (ícone de lápis) > Conecte-se com
+     clientes pelo WhatsApp > Personalizar > Configuração (para apps criados
+     antes de dezembro de 2025: Painel de Apps > WhatsApp > Configuração).
+  2. Clique no link Test ao lado do webhook de mensagens.
+  3. Escolha um dos cenários:
+     - Usuário SEM username: vem wa_id + user_id, sem username.
+     - Usuário COM username e SEM telefone: vem user_id + username, sem
+       telefone.
+     - Usuário COM username e COM telefone: vem tudo.
+     - BSUID principal presente: vem parent_user_id além do BSUID.
+  4. Verifique se sua integração processa cada payload sem erro.
+Saída:     confirmação de que o parser aceita payloads sem telefone.
+Validação: nenhum erro de processamento nos quatro cenários.
+Falhas:    parser que assume wa_id sempre presente.
+Riscos:    não testar o cenário "sem telefone" e quebrar em produção.
+Fontes:    SRC-001 (seção "Teste de webhook").
+Estado:    documentado; não testado.
+
+5.8 PROC-008 — TRATAR WEBHOOK BUSINESS_USERNAME_UPDATES
+
+Objetivo:  acompanhar o status do username comercial.
+Uso:       monitorar aprovação, reserva, exclusão e revogação.
+Pré-req.:  inscrição no campo business_username_updates.
+Entradas:  webhook com status e context.
+Passos:
+  1. Inscreva o app no campo business_username_updates.
+  2. Ao receber o webhook, leia value.username, value.status e
+     value.context.
+  3. Se status = deleted e context = revoked: a Meta revogou o username e
+     ele foi removido.
+  4. Se status = approved e context = revoked: a Meta revogou e substituiu
+     por um username gerado.
+  5. Se status = approved sem context: aprovação normal.
+  6. Se status = reserved: reservado, ainda não visível.
+Saída:     status atualizado no monitoramento.
+Validação: context interpretado corretamente.
+Falhas:    assumir que context ausente significa ação da empresa.
+Riscos:    não detectar revogação.
+Fontes:    SRC-001 (seção "Webhook business_username_updates", changelog
+           de 15 de set. de 2026).
+Estado:    documentado; não testado.
+
+Original (SRC-001):
+  {
+    "object": "whatsapp_business_account",
+    "entry": [
+      {
+        "id": "<WHATSAPP_BUSINESS_ACCOUNT_ID>",
+        "time": <WEBHOOK_TRIGGER_TIMESTAMP>,
+        "changes": [
+          {
+            "field": "business_username_updates",
+            "value": {
+              "display_phone_number": "<BUSINESS_DISPLAY_PHONE_NUMBER>",
+              "username": "<USERNAME>",
+              "status": "<STATUS>",
+              "context": "<CONTEXT>"
+            }
+          }
+        ]
+      }
+    ]
+  }
+
+5.9 PROC-009 — EXCLUIR OU VERIFICAR ENTRADA NA CONTACT BOOK
+
+Objetivo:  remover ou checar o telefone de um usuário na lista de contatos.
+Uso:       LGPD/privacidade ou depuração.
+Pré-req.:  BSUID REGULAR (não principal) do mesmo portfólio do número
+           comercial.
+Entradas:  bsuid.
+Passos:
+  1. Para excluir: DELETE .../contact_book?messaging_product=whatsapp&
+     bsuid=<BSUID>.
+  2. Leia a resposta: success (processado) e deleted (entrada existia e foi
+     excluída).
+  3. Para verificar: GET .../contact_book?messaging_product=whatsapp&
+     bsuid=<BSUID>.
+  4. Leia contacts[].present.
+Saída:     entrada excluída ou status de presença.
+Validação: deleted: true ou present: true/false.
+Falhas:
+  - deleted: false para BSUID desconhecido, inválido ou de outro portfólio
+    (o endpoint não distingue).
+  - BSUID principal falha com erro na verificação.
+Riscos:    após exclusão, o telefone pode voltar se estiver no cache de 30
+           dias ou se houver nova interação.
+Fontes:    SRC-001 (seções "Excluir um contato da agenda", "Verificar uma
+           entrada na agenda de contatos").
+Estado:    documentado; não testado.
+
+Original (SRC-001, exclusão):
+  curl -X DELETE 'https://graph.facebook.com/<API_VERSION>/<BUSINESS_PHONE_NUMBER_ID>/contact_book?messaging_product=whatsapp&bsuid=<BSUID>' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>'
+
+  {
+    "messaging_product": "whatsapp",
+    "success": <SUCCESS?>,
+    "deleted": <DELETED?>
+  }
+
+5.10 PROC-010 — OBTER A CONTA BSUID PRINCIPAL
+
+Objetivo:  descobrir o ID da conta principal e os portfólios inscritos.
+Uso:       empresas gerenciadas com múltiplos portfólios.
+Pré-req.:  inscrição aprovada pela Meta.
+Entradas:  BUSINESS_ID e token.
+Passos:
+  1. Faça GET https://api.facebook.com/<BUSINESS_ID>/parent-bsuid-accounts.
+  2. Leia parent_bsuid_account_id e enrolled_business_portfolios.
+Saída:     ID da conta principal e lista de portfólios.
+Validação: resposta com os dois campos.
+Falhas:    empresa não qualificada/inscrita.
+Riscos:    nenhum outro recurso/permissão é afetado (controles de acesso e
+           cobrança permanecem independentes).
+Fontes:    SRC-001 (seção "Obter conta BSUID principal").
+Estado:    documentado; não testado.
+
+Original (SRC-001):
+  curl 'https://api.facebook.com/<BUSINESS_ID>/parent-bsuid-accounts' \
+  -H 'Authorization: Bearer <ACCESS_TOKEN>'
+
+  {
+    "parent_bsuid_account_id": "<PARENT_BSUID_ACCOUNT_ID>",
+    "enrolled_business_portfolios": [
+      "<BUSINESS_PORTFOLIO_ID>",
+      "<BUSINESS_PORTFOLIO_ID>"
+    ]
+  }
+
+--------------------------------------------------------------------------------
+6. DECISÕES E APRENDIZADOS
+--------------------------------------------------------------------------------
+
+DEC-001 — Usar BSUID como chave primária de usuário, telefone como campo extra
+  Motivo: o telefone pode ser omitido dos webhooks; o BSUID é sempre presente.
+  Alternativas consideradas: manter telefone como chave e tratar BSUID como
+    campo adicional.
+  Evidências: SRC-001 (tabelas de referência rápida); SRC-002 ("Nunca mais
+    use telefone como ID único. Use user_id (BSUID). Telefone é só um campo
+    extra que pode estar ou não.").
+  Data: 23 de out. de 2026.
+  Estado: recomendação; não implementada/testada.
+
+DEC-002 — Ativar o Contact Book
+  Motivo: é o mecanismo que faz o telefone voltar aos webhooks.
+  Alternativas consideradas: depender apenas do cache de 30 dias; solicitar
+    telefone manualmente.
+  Evidências: SRC-001 (seção "Lista de contatos"); SRC-002.
+  Data: 23 de out. de 2026.
+  Estado: recomendação; não implementada/testada.
+
+DEC-003 — Implementar REQUEST_CONTACT_INFO na jornada
+  Motivo: obter o telefone quando o usuário não o compartilha
+    espontaneamente.
+  Alternativas consideradas: não solicitar e operar só com BSUID.
+  Evidências: SRC-001 (seção "Como solicitar o número de telefone dos
+    usuários"); SRC-002.
+  Data: 23 de out. de 2026.
+  Estado: recomendação; não implementada/testada.
+
+Aprendizado — Linha do tempo
+  Início de abril/2026  | BSUIDs começam a chegar nos webhooks (user_id)
+  29 de junho/2026      | Empresas podem reservar/reivindicar username
+   Julho/2026           | APIs passam a aceitar envio para BSUID
+  Início de julho/2026  | Botão REQUEST_CONTACT_INFO disponível
+  Ao longo de 2026      | Lançamento gradual dos nomes de usuário
+
+Original (SRC-001):
+  "Os BSUIDs começaram a aparecer nos webhooks no início de abril de 2026.
+   Entretanto, nossas APIs não aceitarão o envio de mensagens direcionadas
+   aos BSUIDs até julho de 2026."
+
+--------------------------------------------------------------------------------
+7. PADRÕES REUTILIZÁVEIS
+--------------------------------------------------------------------------------
+
+7.1 TABELA DE CÓDIGOS DE ERRO — USERNAME API (Original, SRC-001)
+
+  Código  | Detalhes                                  | Motivo e soluções
+  --------+-------------------------------------------+-------------------
+  10      | O app não tem permissão para esta ação    | Confirme que o
+          |                                           | usuário do sistema
+          |                                           | cujo token é usado
+          |                                           | na solicitação tem o
+          |                                           | acesso a ativos de
+          |                                           | negócios apropriado
+          |                                           | na conta do WhatsApp
+          |                                           | e na conta de
+          |                                           | mensagens: controle
+          |                                           | total ou acesso
+          |                                           | parcial para números
+          |                                           | de telefone.
+  33      | Identificação inválida                    | (1) A identificação
+          |                                           | do número de
+          |                                           | telefone comercial é
+          |                                           | inválida, (2) a conta
+          |                                           | do WhatsApp associada
+          |                                           | ao número de telefone
+          |                                           | comercial foi
+          |                                           | excluída ou (3) o
+          |                                           | usuário cujo token
+          |                                           | foi usado na
+          |                                           | solicitação não
+          |                                           | concedeu ao app a
+          |                                           | permissão
+          |                                           | whatsapp_business_
+          |                                           | management (que
+          |                                           | requer Advanced
+          |                                           | Access se você for um
+          |                                           | provedor de soluções)
+  100     | Parâmetro inválido                        | O formato de nome de
+          |                                           | usuário é inválido.
+  147001  | Nome de usuário indisponível              | O nome de usuário já
+          |                                           | foi reivindicado, não
+          |                                           | é aprovado nas nossas
+          |                                           | verificações internas
+          |                                           | ou não está
+          |                                           | disponível na
+          |                                           | plataforma. Tente
+          |                                           | solicitar outro nome
+          |                                           | de usuário.
+  147002  | Conta não qualificada para solicitar um   | O portfólio
+          | nome de usuário                           | empresarial que é
+          |                                           | proprietário da
+          |                                           | conta do WhatsApp e
+          |                                           | do número de telefone
+          |                                           | comercial deve ter um
+          |                                           | limite de mensagens
+          |                                           | mais alto.
+  147003  | Conta do Facebook não vinculada           | Você deve vincular o
+          |                                           | número de telefone à
+          |                                           | Página do Facebook
+          |                                           | que já usa o nome de
+          |                                           | usuário solicitado.
+  147004  | Conta do Instagram não vinculada          | Você deve vincular o
+          |                                           | número de telefone à
+          |                                           | conta do Instagram que
+          |                                           | já usa o nome de
+          |                                           | usuário solicitado.
+  147005  | Transferência de nome de usuário          | O nome de usuário
+          | necessária                                | solicitado já está em
+          |                                           | uso em outro número
+          |                                           | de telefone comercial
+          |                                           | no seu portfólio
+          |                                           | empresarial. Para
+          |                                           | transferi-lo para esse
+          |                                           | número de telefone,
+          |                                           | reenvie a solicitação
+          |                                           | com transfer_action
+          |                                           | definido como
+          |                                           | force_transfer.
+  133010  | Conta não registrada                      | O número de telefone
+          |                                           | comercial precisa
+          |                                           | estar registrado para
+          |                                           | uso da API.
+
+7.2 CÓDIGO DE ERRO — MESSAGES API (Original, SRC-001)
+
+  Código  | Detalhes
+  --------+-------------------------------------------------------------
+  131062  | Business-scoped User ID (BSUID) recipients are not supported
+          | for this message.
+
+7.3 REGRAS DE FORMATO — USERNAME COMERCIAL (Original, SRC-001)
+
+  "Os nomes de usuário comerciais devem ter o seguinte formato:
+   - podem conter apenas letras do alfabeto inglês (a-z), dígitos (0-9),
+     ponto (.) e caracteres de sublinhado (_)
+   - caracteres que não são letras do alfabeto inglês (como ñ, é, ü) não
+     são compatíveis e causarão falhas na solicitação
+   - devem ter entre 3 e 35 caracteres
+   - devem conter pelo menos uma letra do alfabeto inglês (a-z, A-Z)
+   - não podem começar nem terminar com ponto nem ter dois pontos
+     consecutivos
+   - não devem começar com www.
+   - não devem terminar com um domínio (por exemplo, .com, .org, .net,
+     .int, .edu, .gov, .mil, .arpa, .html, .htm, .txt, .xml).
+   - a diferença entre maiúsculas e minúsculas é ignorada ao comparar nomes
+     de usuário, mas os caracteres de ponto e sublinhado não."
+
+7.4 CHECKLIST DE MIGRAÇÃO
+
+  [ ] Atualizar o parser de webhook para aceitar user_id, from_user_id,
+      recipient_user_id, parent_user_id, username.
+  [ ] Parar de assumir que wa_id / from / recipient_id sempre existem.
+  [ ] Criar coluna de BSUID no banco/CRM e mapear telefone <-> BSUID.
+  [ ] Ajustar a função de envio para aceitar recipient além de to.
+  [ ] Ativar o Contact Book em Meta Business Suite > Configurações da
+      empresa > Informações da empresa.
+  [ ] Implementar REQUEST_CONTACT_INFO e tratar a recusa.
+  [ ] Tratar webhooks de sistema user_changed_number e
+      user_changed_user_id.
+  [ ] Testar os quatro cenários no Painel de Apps (PROC-007).
+  [ ] Se multi-portfólio: avaliar BSUID principal e acesso central ao CRM.
+
+Original (SRC-001, FAQ):
+  "Atualizar suas integrações de webhook para aceitar BSUIDs (e o BSUID
+   principal, se estiver utilizando). Desenvolver lógica para possibilitar o
+   uso de vários identificadores (números de telefone de usuários que não
+   são nomes de usuário; BSUIDs dos usuários que adotam nomes de usuário se
+   o número de telefone não estiver presente nos webhooks) e mapear os
+   campos relevantes de volta para seu CRM/banco de dados."
+
+  "Caso você ainda não tenha adotado o BSUID e não consiga processar
+   mensagens de usuários que fizeram a alteração, não será possível tomar
+   providências ou realizar ações corretivas."
+
+--------------------------------------------------------------------------------
+8. ITENS NÃO CLASSIFICADOS
+--------------------------------------------------------------------------------
+
+  Item                                     | Fonte   | Observação
+  -----------------------------------------+---------+----------------------
+  Painel "Meta Configuração" (contas        | SRC-002 | Contexto de uso do
+  conectadas, personalização, dados de      |         | Meta AI; não é
+  negócios, preferências do app)            |         | documentação técnica
+                                            |         | da Plataforma.
+  Estratégia de tráfego de resposta direta  | SRC-003 | Conteúdo de negócio/
+  para veículos usados em Uberlândia        |         | marketing; ver
+                                            |         | MAN-MARKETING-
+                                            |         | DIRECTRESPONSE-001.
+  Menção a "Testar sem personalização"      | SRC-003 | Sem contexto
+                                            |         | suficiente.
+                                            |         | LACUNA.
+
+--------------------------------------------------------------------------------
+9. LACUNAS E CONFLITOS
+--------------------------------------------------------------------------------
+
+LAC-001 — Stack da integração não informada
+  Dado faltante: linguagem/framework e provedor (webhook próprio vs.
+    Twilio/360Dialog/Gupshup).
+  Impacto: impossível indicar o trecho exato de código a alterar.
+  Como obter: perguntar ao responsável (Pergunta 1 na Seção 12).
+
+LAC-002 — Contact Book não confirmado como ativado
+  Dado faltante: status atual do recurso na conta.
+  Impacto: sem ele, o telefone pode não voltar aos webhooks.
+  Como obter: verificar em Meta Business Suite > Configurações da empresa >
+    Informações da empresa.
+
+LAC-003 — BSUID principal não confirmado
+  Dado faltante: se a empresa é gerenciada com múltiplos portfólios e se foi
+    inscrita.
+  Impacto: define se parent_user_id aparecerá nos webhooks.
+  Como obter: consultar o ponto de contato da Meta; usar PROC-010.
+
+LAC-004 — Sem testes práticos registrados
+  Dado faltante: resultados reais de envio/recebimento com BSUID.
+  Impacto: todos os procedimentos estão "documentados; não testados".
+  Como obter: executar PROC-007 no Painel de Apps e registrar resultados.
+
+LAC-005 — Detalhes de grupos e ligações não aprofundados
+  Dado faltante: exemplos completos de webhooks de grupos e SIP além dos
+    trechos da fonte.
+  Impacto: cobertura parcial para quem usa Groups API ou Calls API.
+  Como obter: consultar a documentação oficial específica.
+
+CON-001 — Datas de disponibilidade divergentes entre versões do documento
+  Conflito: a fonte registra mudanças de data ao longo do changelog (ex.:
+    envio para BSUID previsto para maio/2026, depois julho/2026;
+    REQUEST_CONTACT_INFO previsto para maio/2026, depois julho/2026; webhook
+    BSUID de 31 de março para início de abril/2026).
+  Alternativas preservadas: usar as datas mais recentes do changelog
+    (julho/2026 para envio; início de julho/2026 para o botão; início de
+    abril/2026 para webhooks).
+  Estado: resolvido a favor da versão mais recente; datas antigas
+    preservadas no histórico (Seção 11).
+
+CON-002 — "Tráfego direto" vs. "resposta direta"
+  Conflito aparente: SRC-003 distingue os dois conceitos; não há conflito
+    técnico com BSUID.
+  Estado: esclarecido na fonte; registrado para evitar confusão futura.
+
+CON-003 — Duplicidade de fontes do documento Meta
+  Conflito: o mesmo documento foi fornecido em dois arquivos
+    ("analisa esse documento aqui.txt" e "Título da conversa.txt").
+  Alternativas preservadas: tratados como SRC-001 (conteúdo idêntico).
+    Possível duplicidade registrada; nenhum conteúdo perdido.
+
+--------------------------------------------------------------------------------
+10. TABELA DE RASTREABILIDADE
+--------------------------------------------------------------------------------
+
+  INF     | Descrição                              | SRC     | Localização
+  --------+----------------------------------------+---------+------------
+  INF-001 | Nomes de usuário opcionais; exibidos   | SRC-001 | "Nomes de
+          | em vez do telefone                     |         | usuário"
+  INF-002 | BSUID obrigatório para parceiros,      | SRC-001 | Introdução
+          | empresas e CTWA                        |         |
+  INF-003 | Formato do BSUID                       | SRC-001 | "ID de usuário
+          |                                        |         | no escopo da
+          |                                        |         | empresa"
+  INF-004 | BSUID único por usuário + portfólio    | SRC-001 | Idem
+  INF-005 | BSUID regerado ao trocar de número     | SRC-001 | Idem
+  INF-006 | BSUID não serve para templates de      | SRC-001 | Idem
+          | autenticação                           |         |
+  INF-007 | BSUID principal usa ENT e requer       | SRC-001 | "IDs de usuário
+          | inscrição                              |         | no escopo da
+          |                                        |         | empresa
+          |                                        |         | principal"
+  INF-008 | Telefone incluído se interação em 30   | SRC-001 | "Números de
+          | dias ou Contact Book                   |         | telefone"
+  INF-009 | Condições de 30 dias avaliadas por     | SRC-001 | Idem
+          | número comercial                       |         |
+  INF-010 | Envio para BSUID a partir de jul/2026  | SRC-001 | Idem + changelog
+  INF-011 | REQUEST_CONTACT_INFO início jul/2026   | SRC-001 | Changelog
+          |                                        |         | 29/06/2026
+  INF-012 | Botão não pode ser personalizado       | SRC-001 | "Uso de
+          |                                        |         | modelos"
+  INF-013 | origin: contact_request ou other;      | SRC-001 | "Webhook de
+          | vcard só em other                      |         | contatos"
+  INF-014 | Contact Book por portfólio; não        | SRC-001 | "Lista de
+          | sincroniza                             |         | contatos"
+  INF-015 | Desativar Contact Book apaga dados     | SRC-001 | Idem
+  INF-016 | Username comercial não oculta telefone | SRC-001 | "Nomes de
+          |                                        |         | usuário
+          |                                        |         | comerciais"
+  INF-017 | Formato do username comercial          | SRC-001 | Idem
+  INF-018 | Prioridade de exibição                 | SRC-001 | "Prioridade de
+          |                                        |         | exibição"
+  INF-019 | transfer_action: none | force_transfer| SRC-001 | "Como adotar ou
+          | erro 147005                            |         | alterar"
+  INF-020 | Webhook business_username_updates      | SRC-001 | Seção do
+          |                                        |         | webhook +
+          |                                        |         | changelog
+          |                                        |         | 15/09/2026
+  INF-021 | user_id_update não assinável; chega    | SRC-001 | "user_id_update
+          | em messages como system                |         | webhooks"
+  INF-022 | user_changed_number vs                 | SRC-001 | "Webhooks de
+          | user_changed_user_id                   |         | mensagens do
+          |                                        |         | sistema"
+  INF-023 | previous_user_id e                     | SRC-001 | Idem
+          | previous_parent_user_id                |         |
+  INF-024 | Contact Book não aceita BSUID          | SRC-001 | "Verificar uma
+          | principal                              |         | entrada"
+  INF-025 | Bloqueio/desbloqueio não aceita BSUID  | SRC-001 | "API de
+          | principal                              |         | Bloqueio"
+  INF-026 | Código 131062 para BSUID não suportado | SRC-001 | "Códigos de
+          |                                        |         | erro"
+  INF-027 | Teste no Painel de Apps com 4          | SRC-001 | "Teste de
+          | cenários                               |         | webhook"
+  INF-028 | Sem correção retroativa                | SRC-001 | FAQ
+  INF-029 | Recomendação de BSUID como chave       | SRC-002 | Resposta
+          | primária                               |         | analítica
+  INF-030 | Contexto de negócio: veículos usados   | SRC-003 | Doc de
+          | em Uberlândia + automação              |         | resposta direta
+
+  (Colunas Destino, Estado e Relações omitidas aqui por largura; no arquivo
+  em markdown do chat elas estão completas.)
+
+--------------------------------------------------------------------------------
+11. HISTÓRICO DE ATUALIZAÇÕES
+--------------------------------------------------------------------------------
+
+  Versão | Data                | Alteração
+  -------+---------------------+------------------------------------------
+  1.0    | 23 de out. de 2026  | Criação inicial a partir de SRC-001,
+         |                     | SRC-002, SRC-003 e SRC-004. Análise
+         |                     | documental (documento/tema/seção).
+         |                     | Nenhum teste prático executado.
+
+HISTÓRICO PRESERVADO DA FONTE (changelog do documento Meta, SRC-001):
+
+  15/09/2026 | Adicionada propriedade context aos webhooks
+             | business_username_updates; corrigidas descrições de
+             | deleted e approved.
+  24/08/2026 | Adicionada subseção "Verificar uma entrada da agenda de
+             | contatos" (GET com present booleano).
+  11/08/2026 | Corrigido user_id_update (não assinável); adicionado
+             | user_changed_user_id; adicionados previous_user_id/
+             | previous_parent_user_id; corrigido system.type e
+             | system.body.
+  29/06/2026 | Reserva/reivindicação de username a partir de 29/06/2026;
+             | envio para BSUID a partir de julho/2026;
+             | REQUEST_CONTACT_INFO no início de julho/2026;
+             | esclarecimento sobre rótulo do botão.
+  12/06/2026 | from_user_id/from_parent_user_id em revogação e edição;
+             | exemplos smb_message_echoes.
+  10/06/2026 | transfer_action (none, force_transfer); erro 147005.
+  28/05/2026 | Renomeado contact_request -> request_contact_info; URL de
+             | parent-bsuid-accounts para api.facebook.com.
+  11/05/2026 | Correção do exemplo de REQUEST_CONTACT_INFO.
+  07/05/2026 | Contact Book usada só para webhooks, não respostas de API.
+  05/05/2026 | parent_recipient_user_id -> recipient_parent_user_id.
+  04/05/2026 | Correções em recipient_user_id/
+             | recipient_participant_user_id; exemplos de falha; expansão
+             | de REQUEST_CONTACT_INFO; exclusão de contato; API de
+             | Bloqueio; renomeação de webhooks de sistema; user_id em
+             | remoção de participantes; from_user_id em revogação; name
+             | em smb_message_echoes.
+  09/04/2026 | Correção de parent_user_id -> parent_recipient_user_id no
+             | bloco statuses.
+  31/03/2026 | Implantação do webhook BSUID movida para início de abril/
+             | 2026; limitações do Contact Book; extração automática de
+             | telefone de vCard; correção do caminho no Painel de Apps;
+             | aviso de disponibilidade.
+  23/03/2026 | Correção sobre user_id quando telefone e BSUID são
+             | enviados juntos.
+  18/03/2026 | Tabelas de referência rápida; seção de testes;
+             | user_id_update; respostas de bloqueio; formato ENT; nota
+             | sobre botão; Contact Book; formato de username; caracteres
+             | não ingleses; condições de 30 dias por número; remoção de
+             | "Você está na lista de contatos do WhatsApp do usuário".
+  18/02/2026 | Solicitações podem incluir telefone e BSUID; telefone tem
+             | precedência.
+  06/02/2026 | BSUID de 256 -> 128 alfanuméricos; BSUID em propriedades
+             | dedicadas; código do país como prefixo; BSUID principal;
+             | Contact Book; botão de solicitação; omissão em vez de
+             | string vazia; erros de username; sintaxe de resposta;
+             | remoção de cancelamento; phone_number_username_update ->
+             | business_username_updates.
+
+  SUBSTITUÍDO: as datas antigas listadas acima foram substituídas pelas
+  datas mais recentes do changelog (ver CON-001). Preservadas aqui para
+  rastreabilidade.
+
+--------------------------------------------------------------------------------
+12. PERGUNTAS PRIORITÁRIAS (máximo 5)
+--------------------------------------------------------------------------------
+
+  1. Qual é a stack da sua integração (webhook próprio, n8n,
+     Python/FastAPI, Twilio, 360Dialog, Gupshup)? — Necessário para indicar
+     o trecho exato de código a alterar (LAC-001).
+  2. O Contact Book já está ativado em Meta Business Suite > Configurações
+     da empresa > Informações da empresa? — Define se o telefone voltará
+     aos webhooks (LAC-002).
+  3. Sua empresa é gerenciada com múltiplos portfólios e foi inscrita para
+     BSUID principal? — Define se parent_user_id aparecerá (LAC-003).
+  4. Você já recebeu algum webhook real com user_id (BSUID) desde abril/
+     2026? — Permite confirmar o estado atual e registrar evidência
+     (LAC-004).
+  5. Qual é o fluxo de atendimento atual (bot no WhatsApp, CRM, planilha) e
+     onde o telefone é usado como chave? — Orienta a migração para BSUID
+     como chave primária (DEC-001).
+
+--------------------------------------------------------------------------------
+13. CHECAGEM FINAL
+--------------------------------------------------------------------------------
+
+  [x] Fontes acessíveis inventariadas; limites declarados (análise
+      documental, não linha a linha).
+  [x] Informações no contexto e ordem lógica corretos.
+  [x] Conteúdo, duplicidades, tentativas, erros, histórico e versões
+      preservados.
+  [x] Código completo disponível, bem delimitado e explicado; testes não
+      inventados (todos "documentado; não testado").
+  [x] Comandos/tabelas bem formatados; termos técnicos no Glossário.
+  [x] Procedimentos repetíveis por leigo.
+  [x] Lacunas, conflitos e estados identificados; rastreabilidade realista.
+  [x] Segredos protegidos (uso de placeholders <ACCESS_TOKEN>, <BSUID>).
+  [x] Fontes/histórico/versão atualizados.
+  [x] Conteúdo entregue em bloco .txt para salvamento manual pelo usuário.
+
+================================================================================
+FIM DO MANUAL — MAN-WHATSAPP-BSUID-001_v1.0
+================================================================================
