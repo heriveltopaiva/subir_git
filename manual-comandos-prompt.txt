@@ -1,0 +1,393 @@
+================================================================
+MANUAL DE INSTRUÇÕES — COMANDOS DE PROMPT
+Versão 1.0 · Guia completo de uso, posicionamento e combinação
+================================================================
+
+----------------------------------------------------------------
+1. O QUE SÃO ESSES COMANDOS
+----------------------------------------------------------------
+São atalhos de palavras-chave (prompt shortcuts) que você digita
+junto com seu pedido para mudar COMO a IA responde — o tom, a
+profundidade, o formato ou o nível de crítica. Não são comandos
+oficiais de nenhuma plataforma; funcionam como instruções em
+linguagem natural que a IA interpreta.
+
+REGRA BÁSICA: sempre escreva o comando exatamente como está
+(com a barra "/"), seguido do seu pedido ou do material a ser
+analisado.
+
+----------------------------------------------------------------
+2. TABELA-RESUMO DE TODOS OS COMANDOS
+----------------------------------------------------------------
+#   COMANDO          FUNÇÃO                              POSIÇÃO
+1   /human           Tom natural, humano, sem jargão     Começo
+2   /Blindspot       Expõe erro crítico / ponto cego     Final
+3   /X10THINK        Análise profunda passo a passo      Começo
+4   /KILLCRITIC      Crítica brutalmente honesta         Final
+5   /ALT3            3 alternativas distintas            Final
+6   /ELI10 (/ELI5)   Explica como para criança           Começo/Final
+7   /TRUTHMODE       Precisão, reduz alucinação          Começo
+8   /TABULAR         Converte em tabela limpa            Final
+9   /ACT AS [papel]  Assume persona de especialista      Começo
+10  Passo a passo    Mostra raciocínio antes da resposta Final
+11  /LISTIFY         Transforma em lista de pontos       Final
+
+----------------------------------------------------------------
+3. FICHA DETALHADA DE CADA COMANDO
+----------------------------------------------------------------
+
+3.1 /human
+- O que faz: remove o "sotaque de IA", deixa a linguagem
+  coloquial, direta e natural.
+- Quando usar: redes sociais, e-mails casuais, mensagens,
+  quando a resposta ficou rígida ou formal demais.
+- Onde colocar: COMEÇO. Se quiser no final, escreva:
+  "Reescreva tudo acima em tom /human."
+- Exemplo: /human Me explica o que é CDB de um jeito simples.
+- Cuidado: sozinho no final, às vezes humaniza só metade.
+
+3.2 /Blindspot
+- O que faz: identifica e expõe o erro mais crítico ou o
+  ponto cego da sua ideia, estratégia ou texto.
+- Quando usar: antes de lançar produto, enviar proposta,
+  tomar decisão importante.
+- Onde colocar: FINAL (a IA precisa ler a ideia primeiro).
+- Exemplo: [cole sua estratégia]. /Blindspot Qual o erro
+  mais fatal que eu não estou vendo?
+
+3.3 /X10THINK
+- O que faz: força análise profunda, passo a passo, com
+  solução estratégica de alto nível.
+- Quando usar: problemas complexos, decisões estratégicas,
+  quando não quer resposta superficial.
+- Onde colocar: COMEÇO.
+- Exemplo: /X10THINK Como valido uma ideia de SaaS com
+  orçamento zero?
+
+3.4 /KILLCRITIC
+- O que faz: desliga a bajulação, faz crítica brutalmente
+  honesta e realista, apontando erros e fraquezas.
+- Quando usar: quando precisa de feedback real (mesmo
+  desconfortável), para testar resistência de um plano.
+- Onde colocar: FINAL.
+- Exemplo: Aqui está meu plano: [texto]. /KILLCRITIC
+  Aponte as fraquezas reais.
+- Cuidado: sem contexto/restrições reais, a crítica fica
+  vazia. Diga orçamento, equipe, prazo.
+
+3.5 /ALT3
+- O que faz: entrega 3 alternativas de resposta distintas
+  e criativas.
+- Quando usar: quando está indeciso ou quer estimular a
+  criatividade e comparar possibilidades.
+- Onde colocar: FINAL.
+- Exemplo: Preciso divulgar meu curso sem gastar em
+  anúncios. /ALT3
+
+3.6 /ELI10 (ou /ELI5)
+- O que faz: explica como se fosse para uma criança de 10
+  (ou 5) anos.
+- Quando usar: para testar se você entendeu — se a
+  explicação continuar confusa, o conceito é abstrato demais.
+- Onde colocar: começo ou final.
+- Exemplo: /ELI10 O que é inflação?
+
+3.7 /TRUTHMODE
+- O que faz: foca em precisão, reduz especulação e
+  alucinação, marcando explicitamente as partes incertas.
+- Quando usar: verificação de dados, fatos históricos,
+  quando não quer que a IA invente.
+- Onde colocar: COMEÇO.
+- Exemplo: /TRUTHMODE Quais foram as causas da Crise de
+  1929? Marque o que for incerto.
+
+3.8 /TABULAR
+- O que faz: converte grandes blocos de texto em tabela limpa.
+- Quando usar: para comparar rapidamente vantagens e
+  desvantagens, listar parâmetros, resumir comparações.
+- Onde colocar: FINAL.
+- Exemplo: Compare Python, JavaScript e Go para backend.
+  /TABULAR
+
+3.9 /ACT AS [papel]
+- O que faz: faz a IA interpretar um especialista específico.
+- Quando usar: quando quer "cheiro profissional" na área e
+  evitar sugestões leigas.
+- Onde colocar: COMEÇO.
+- Exemplo: /ACT AS auditor financeiro sênior Revise este
+  orçamento: [texto].
+
+3.10 Passo a passo
+- O que faz: força a IA a mostrar o raciocínio antes da
+  resposta.
+- Quando usar: quando suspeita que a IA "acertou por acaso"
+  — ver os passos revela onde está a falha lógica.
+- Onde colocar: FINAL (ou junto do pedido).
+- Exemplo: Resolva este problema de lógica. Passo a passo.
+
+3.11 /LISTIFY
+- O que faz: transforma o texto em lista de pontos clara.
+- Quando usar: quando precisa executar algo — lista é mais
+  operacional que texto corrido.
+- Onde colocar: FINAL.
+- Exemplo: Como organizar minha rotina de estudos?
+  /LISTIFY
+
+----------------------------------------------------------------
+4. REGRA DE OURO DE POSICIONAMENTO
+----------------------------------------------------------------
+Comando de "como pensar"  -> COMEÇO.
+Comando de "como entregar / revisar" -> FINAL.
+
+COMEÇO: /human, /X10THINK, /TRUTHMODE, /ACT AS, /ELI10
+FINAL:  /Blindspot, /KILLCRITIC, /ALT3, /TABULAR,
+        /LISTIFY, Passo a passo
+
+Único caso em que a posição realmente importa:
+/human (começo) e /KILLCRITIC (final).
+
+----------------------------------------------------------------
+5. COMBINAÇÕES PRONTAS (COPIE E USE)
+----------------------------------------------------------------
+
+5.1 Avaliar um plano a fundo
+---
+/X10THINK
+
+[cole seu plano aqui]
+
+/Blindspot
+
+/KILLCRITIC
+
+/ALT3
+
+Por fim, reescreva a alternativa mais viável em tom /human.
+---
+Lógica: raciocínio profundo -> contexto -> ponto cego +
+crítica -> alternativas -> humaniza o resultado.
+
+5.2 Aprender um conceito difícil
+---
+/ELI10
+
+/TRUTHMODE
+
+Me explique [conceito]. Depois, /LISTIFY os pontos
+principais.
+---
+Lógica: explica simples -> com precisão -> lista.
+
+5.3 Comparar opções
+---
+/ACT AS especialista em [área]
+
+Compare [opção A], [opção B] e [opção C] para [objetivo].
+
+/TABULAR
+
+/ALT3
+---
+Lógica: persona especialista -> comparação -> tabela ->
+alternativas.
+
+5.4 Testar resistência de uma ideia
+---
+[descreva sua ideia com restrições reais: orçamento,
+prazo, equipe]
+
+/KILLCRITIC
+
+/Blindspot
+
+Antes de responder, liste quais informações eu não forneci
+que podem fazer sua conclusão estar errada.
+---
+Lógica: crítica dura -> ponto cego -> expõe premissas
+ocultas.
+
+----------------------------------------------------------------
+6. COMO SE APROXIMAR DA "REALIDADE" (3 REGRAS)
+----------------------------------------------------------------
+1. DÊ RESTRIÇÕES DE CONTEXTO. Só /KILLCRITIC não basta.
+   Diga: "Sou uma pessoa só, orçamento de R$ 5.000".
+   Sem restrições, a crítica é vazia.
+2. COMBINE COMANDOS EM SEQUÊNCIA. Divergir primeiro
+   (/ALT3), depois convergir (/KILLCRITIC), depois refinar
+   (/X10THINK).
+3. PEÇA AS PREMISSAS OCULTAS. Sempre que quiser realidade,
+   adicione no final:
+   "Antes de responder, liste quais informações eu não
+   forneci que podem fazer sua conclusão estar errada."
+
+----------------------------------------------------------------
+7. ERROS COMUNS (EVITE)
+----------------------------------------------------------------
+ERRO                                  | CORREÇÃO
+--------------------------------------|-------------------------
+/KILLCRITIC no começo sem contexto    | Coloque no final, depois
+                                      | do material
+/human sozinho no final               | Use no começo, ou escreva
+                                      | "reescreva em /human"
+Empilhar 6 comandos sem pedido claro  | Máximo 3-4 comandos, com
+                                      | pedido explícito
+Esperar "realidade" sem restrições    | Informe orçamento, prazo,
+                                      | equipe, objetivo
+Escrever comando sem a barra          | Mantenha o formato
+                                      | /comando
+
+----------------------------------------------------------------
+8. CHECKLIST RÁPIDO ANTES DE ENVIAR
+----------------------------------------------------------------
+[ ] O comando está escrito com a barra "/"?
+[ ] Coloquei comandos de "pensar" no começo e de "revisar"
+    no final?
+[ ] Dei contexto real (orçamento, prazo, objetivo)?
+[ ] Usei no máximo 3-4 comandos?
+[ ] Pedi para a IA listar as premissas incertas quando
+    preciso de realidade?
+
+
+================================================================
+9. EXPANSÃO: COMANDOS DO "PODER ARTIFICIAL" (CLAUDE/CHATGPT)
+================================================================
+Estes comandos focam em produtividade, criação de conteúdo e
+clareza. Siga a mesma regra de ouro: comandos de "como pensar"
+no começo; comandos de "como entregar" no final.
+
+----------------------------------------------------------------
+9.1 /roast -> FINAL
+- O que faz: Crítica dura, sem passar a mão na cabeça (similar
+  ao /KILLCRITIC, mas focado em "zoar" ou expor o ridículo).
+- Quando usar: Para destruir o ego de uma ideia ruim e ver se
+  ela sobrevive.
+- Exemplo: "Aqui está meu novo logo. /roast"
+
+9.2 /devil -> FINAL
+- O que faz: Defende o lado oposto (Advogado do Diabo).
+- Quando usar: Quando você já tem uma tese e quer ver os
+  contra-argumentos mais fortes.
+- Exemplo: "Vou investir em cripto. /devil Me convença do
+  contrário."
+
+9.3 /critique -> FINAL
+- O que faz: Aponta as falhas ANTES de elogiar (evita a
+  bajulação inicial da IA).
+- Quando usar: Para avaliar textos, designs ou planos de forma
+  equilibrada, mas começando pelo que está errado.
+- Exemplo: "Leia este e-mail. /critique"
+
+9.4 /scout -> FINAL
+- O que faz: Mostra os riscos e pontos cegos (similar ao
+  /Blindspot).
+- Quando usar: Antes de tomar decisões arriscadas.
+- Exemplo: "Plano de lançamento do produto. /scout"
+
+9.5 /brief -> COMEÇO ou FINAL
+- O que faz: Dá a resposta mais curta e direta possível.
+- Quando usar: Quando você está com pressa e não quer ler
+  parágrafos.
+- Exemplo: "/brief Como funciona a energia solar?"
+
+9.6 /elis -> COMEÇO ou FINAL
+- O que faz: Explica como para um iniciante (similar ao /ELI5,
+  mas focado em "leigo no assunto").
+- Quando usar: Para aprender um tópico novo do zero.
+- Exemplo: "/elis O que é inteligência artificial generativa?"
+
+9.7 /teacher -> COMEÇO
+- O que faz: Assume postura de professor: ensina E faz
+  perguntas para testar seu conhecimento.
+- Quando usar: Para estudar de verdade e fixar o conteúdo.
+- Exemplo: "/teacher Me ensine sobre a Segunda Guerra Mundial."
+
+9.8 /sources -> FINAL
+- O que faz: Diz onde você pode confirmar a informação (similar
+  ao /TRUTHMODE, mas focado em links/referências).
+- Quando usar: Quando precisa citar dados ou checar fatos.
+- Exemplo: "Quais os benefícios do jejum intermitente?
+  /sources"
+
+9.9 /compare -> FINAL
+- O que faz: Faz um comparativo "lado a lado" (similar ao
+  /TABULAR).
+- Quando usar: Para escolher entre duas ou mais opções.
+- Exemplo: "iPhone 15 vs Galaxy S24. /compare"
+
+9.10 /next -> FINAL
+- O que faz: Mostra suas 3 próximas ações e o porquê.
+- Quando usar: Quando você está travado e precisa de um plano
+  de ação imediato.
+- Exemplo: "Terminei meu site. /next O que eu faço agora?"
+
+9.11 /checklist -> FINAL
+- O que faz: Cria uma lista de ações verificáveis (similar ao
+  /LISTIFY).
+- Quando usar: Para não esquecer nenhum passo de um processo.
+- Exemplo: "Checklist para abrir uma MEI. /checklist"
+
+9.12 /summarize -> FINAL
+- O que faz: Condensa o texto em exatos 3 pontos principais.
+- Quando usar: Para resumir reuniões longas ou artigos.
+- Exemplo: "[Cole um texto longo]. /summarize"
+
+9.13 /hook -> FINAL
+- O que faz: Cria um gancho que segura o scroll (focado em
+  redes sociais).
+- Quando usar: Para começar vídeos, posts ou threads.
+- Exemplo: "Me dê 5 opções de gancho sobre emagrecimento.
+  /hook"
+
+9.14 /script -> FINAL
+- O que faz: Cria um roteiro completo com gancho, conteúdo e
+  CTA (Call to Action).
+- Quando usar: Para gravar vídeos para Reels, TikTok ou YouTube.
+- Exemplo: "Roteiro para um vídeo de 1 minuto sobre Python.
+  /script"
+
+9.15 /voice -> FINAL
+- O que faz: Extrai seu padrão de escrita e reescreve o texto
+  imitando você.
+- Quando usar: Para manter a consistência do seu tom de voz em
+  textos gerados pela IA.
+- Exemplo: "[Cole 3 textos seus]. /voice Reescreva este rascunho
+  no meu estilo."
+
+9.16 /persona -> COMEÇO
+- O que faz: Assume a persona do seu cliente ideal, com dores e
+  objeções (similar ao /ACT AS).
+- Quando usar: Para validar uma oferta ou escrever copy
+  direcionada.
+- Exemplo: "/persona Sou um pai de família de 40 anos. Me venda
+  este curso de finanças."
+
+9.17 /pitch -> FINAL
+- O que faz: Cria um pitch de 30 segundos (elevator pitch).
+- Quando usar: Para apresentar uma ideia rápido para chefes,
+  investidores ou clientes.
+- Exemplo: "Resuma meu projeto em um /pitch de 30 segundos."
+
+9.18 /debug -> FINAL
+- O que faz: Acha e corrige o erro passo a passo (focado em
+  programação, mas serve para lógica).
+- Quando usar: Quando algo deu errado e você não sabe onde.
+- Exemplo: "Meu código deu erro. /debug Explique o passo a passo
+  da correção."
+
+================================================================
+10. REGRA DE OURO ATUALIZADA (COM OS NOVOS COMANDOS)
+================================================================
+COMEÇO (Como pensar / Persona):
+/human, /X10THINK, /TRUTHMODE, /ACT AS, /ELI10,
+/brief, /elis, /teacher, /persona.
+
+FINAL (Como entregar / Revisar):
+/Blindspot, /KILLCRITIC, /ALT3, /TABULAR, /LISTIFY,
+Passo a passo, /roast, /devil, /critique, /scout,
+/sources, /compare, /next, /checklist, /summarize,
+/hook, /script, /voice, /pitch, /debug.
+================================================================
+
+================================================================
+FIM DO MANUAL
+================================================================
